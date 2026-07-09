@@ -5,6 +5,7 @@ import { basename, resolve } from "node:path";
 import { promisify } from "node:util";
 import { Command } from "commander";
 import { BridgeTransport } from "./bridge/client.js";
+import { CADSCRIPT_CHROME_EXTENSION_ID, installChromeExtension } from "./bridge/chrome.js";
 import { installBridge, uninstallBridge } from "./bridge/install.js";
 import { materializeModel } from "./core/model.js";
 import { renderSketchPng, renderSketchSvg } from "./core/preview.js";
@@ -74,7 +75,7 @@ program
 const bridge = program.command("bridge").description("Manage the Chrome native messaging bridge");
 bridge
   .command("install")
-  .requiredOption("--extension-id <id>", "Chrome extension ID")
+  .option("--extension-id <id>", "Chrome extension ID", CADSCRIPT_CHROME_EXTENSION_ID)
   .action(async (options) => {
     const result = await installBridge(options.extensionId);
     process.stdout.write(
@@ -102,9 +103,30 @@ setup.command("codex").action(async () => {
     throw new Error("Codex did not report the Onshape CadScript plugin after installation");
   }
   process.stdout.write(
-    "Installed the Onshape CadScript Codex plugin. Run cadscript doctor next.\n",
+    "Installed the Onshape CadScript Codex plugin. Run cadscript setup chrome next.\n",
   );
 });
+setup
+  .command("chrome")
+  .description("Prepare the local unpacked Chrome extension and native host")
+  .option("--no-open", "do not open Chrome and Finder")
+  .action(async (options) => {
+    const extension = await installChromeExtension();
+    const nativeHost = await installBridge(extension.extensionId);
+    if (options.open) {
+      await run("open", [extension.directory]);
+      await run("open", ["-a", "Google Chrome", "chrome://extensions"]);
+    }
+    process.stdout.write(
+      [
+        `Prepared the unpacked extension at ${extension.directory}`,
+        `Stable extension ID: ${extension.extensionId}`,
+        `Installed native host wrapper at ${nativeHost.wrapper}`,
+        "In chrome://extensions, enable Developer mode, click Load unpacked, and select the prepared directory.",
+        "Then open a signed-in Onshape document and run cadscript doctor --json.",
+      ].join("\n") + "\n",
+    );
+  });
 
 program
   .command("inspect")

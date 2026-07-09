@@ -43,7 +43,7 @@ codex plugin add onshape-cadscript@onshape-cadscript
 The convenience installer runs those same supported Codex commands and verifies the result:
 
 ```sh
-npx -y onshape-cadscript@0.1.1 setup codex
+npx -y onshape-cadscript@0.1.2 setup codex
 ```
 
 Then start a new Codex task and ask for a CAD model. The bundled skill guides Codex through inspect, edit, preview, plan, exact apply, render, measure, no-op verification, and STL export.
@@ -52,10 +52,15 @@ Then start a new Codex task and ask for a CAD model. The bundled skill guides Co
 
 CadScript does not receive your Onshape password or an API key. A narrow Chrome extension performs allowlisted Onshape API requests using the browser session you already control, while a token-protected native host carries messages locally.
 
-1. Install the Chrome Web Store extension. Until review is complete, use the [unpacked development instructions](https://ricokahler.github.io/onshape-cadscript/setup/chrome.html).
-2. Open Onshape in Chrome and sign in normally.
-3. Run `cadscript bridge install --extension-id <extension-id>`.
-4. Run `cadscript doctor --json`.
+Prepare the extension and native host:
+
+```sh
+npx -y onshape-cadscript@0.1.2 setup chrome
+```
+
+The command opens Chrome's Extensions page and reveals the prepared extension directory. Enable Developer Mode, click **Load unpacked**, and select that directory. Then open Onshape, sign in normally, and run `cadscript doctor --json`.
+
+The manifest carries a stable development identity, so native messaging keeps working across package updates. Chrome does not automatically update unpacked extensions; rerun `setup chrome` after upgrading CadScript and click **Reload** on the extension card. See the [local Chrome setup guide](https://ricokahler.github.io/onshape-cadscript/setup/chrome.html).
 
 The v0.1 bridge supports macOS 13+ with Google Chrome and Node.js 22.14+. Other desktop/browser combinations are tracked in the [roadmap](./ROADMAP.md).
 

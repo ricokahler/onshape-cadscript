@@ -2,6 +2,7 @@ import { access } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { BridgeTransport } from "./bridge/client.js";
+import { CADSCRIPT_CHROME_EXTENSION_ID, chromeExtensionDirectory } from "./bridge/chrome.js";
 import { BRIDGE_HOST_NAME, bridgeConfigPath, readBridgeConfig } from "./bridge/config.js";
 
 export interface DoctorCheck {
@@ -47,18 +48,26 @@ export async function runDoctor(): Promise<DoctorReport> {
     const config = await readBridgeConfig();
     checks.push({
       name: "bridge-config",
-      ok: config.extensionIds.length > 0,
-      detail: `${bridgeConfigPath()} (${config.extensionIds.length} extension ID${config.extensionIds.length === 1 ? "" : "s"})`,
-      fix: "Run cadscript bridge install --extension-id <chrome-extension-id>.",
+      ok: config.extensionIds.includes(CADSCRIPT_CHROME_EXTENSION_ID),
+      detail: `${bridgeConfigPath()} (${config.extensionIds.join(", ") || "no extension IDs"})`,
+      fix: "Run cadscript setup chrome.",
     });
   } catch (error) {
     checks.push({
       name: "bridge-config",
       ok: false,
       detail: error instanceof Error ? error.message : String(error),
-      fix: "Run cadscript bridge install --extension-id <chrome-extension-id>.",
+      fix: "Run cadscript setup chrome.",
     });
   }
+
+  const extensionManifest = join(chromeExtensionDirectory(), "manifest.json");
+  checks.push({
+    name: "chrome-extension-files",
+    ok: await exists(extensionManifest),
+    detail: extensionManifest,
+    fix: "Run cadscript setup chrome, then load its directory from chrome://extensions.",
+  });
 
   const manifest = join(
     homedir(),
@@ -73,7 +82,7 @@ export async function runDoctor(): Promise<DoctorReport> {
     name: "native-host",
     ok: await exists(manifest),
     detail: manifest,
-    fix: "Run cadscript bridge install --extension-id <chrome-extension-id>.",
+    fix: "Run cadscript setup chrome.",
   });
 
   try {

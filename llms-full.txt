@@ -441,12 +441,12 @@ The marketplace entry, plugin manifest, MCP package pin, and Chrome extension ve
 - Inspect both npm tarballs.
 - Run clean `npx` and MCP startup.
 - Install the plugin from the GitHub marketplace.
-- Install Chrome extension and native host on a clean macOS account.
+- Run `setup chrome`, load the prepared unpacked extension, and verify the stable extension ID on a clean macOS account.
 - Run read-only Onshape health and render.
 - Create/select an empty Part Studio.
 - Run plan, exact apply, render, measure, and no-op replan.
 - Export a non-empty STL and check expected bounds.
-- Publish signed GitHub release checksums, changelog, npm links, Chrome link, coverage snapshot, and extension ZIP.
+- Publish signed GitHub release checksums, changelog, npm links, local Chrome setup link, coverage snapshot, and extension ZIP.
 
 After the first manual npm publish, configure both packages to trust
 `.github/workflows/release.yml` in `ricokahler/onshape-cadscript`. Then enable the release job:
@@ -585,24 +585,40 @@ Source: setup/chrome.md
 
 CadScript uses the Onshape session already signed in to Chrome. It does not ask for a password or API key.
 
-## Chrome Web Store
+## Prepare The Local Extension
 
-The public listing link will appear here after Chrome Web Store review. Chrome requires store distribution for normal public installation; see [Chrome's distribution guidance](https://developer.chrome.com/docs/extensions/how-to/distribute). Until review completes:
-
-1. Download the extension ZIP from the GitHub release.
-2. Unzip it.
-3. Open `chrome://extensions`.
-4. Enable Developer mode and choose **Load unpacked**.
-5. Select `extension/chrome` and copy the extension ID.
-
-Register the native host:
+Run:
 
 ```sh
-cadscript bridge install --extension-id <extension-id>
-cadscript doctor --json
+npx -y onshape-cadscript@0.1.2 setup chrome
 ```
 
-Open an Onshape document in Chrome before running the health check.
+CadScript copies the bundled Manifest V3 extension to:
+
+```text
+~/Library/Application Support/onshape-cadscript/chrome-extension
+```
+
+It also registers the native messaging host for the extension's stable ID and opens both the directory and `chrome://extensions`.
+
+1. Enable **Developer mode** in Chrome.
+2. Click **Load unpacked**.
+3. Select the prepared `chrome-extension` directory.
+4. Open an Onshape document and sign in normally.
+5. Run `cadscript doctor --json`.
+
+Loading the unpacked directory is the only manual installation step. The extension ID is fixed by its public manifest key, so users do not copy IDs and native-host permissions do not drift between versions.
+
+## Updating
+
+Chrome does not automatically update unpacked extensions. After updating the npm package:
+
+1. Run `npx -y onshape-cadscript@latest setup chrome` again.
+2. Open `chrome://extensions`.
+3. Click **Reload** on Onshape CadScript Bridge.
+4. Run `cadscript doctor --json`.
+
+For custom extension builds, `cadscript bridge install --extension-id <id>` remains available as an explicit development override.
 
 ## Boundaries
 
@@ -620,7 +636,7 @@ The plugin bundles the CadScript skill and launches the matching MCP server with
 ```json
 {
   "command": "npx",
-  "args": ["-y", "onshape-cadscript@0.1.1", "mcp", "--stdio"]
+  "args": ["-y", "onshape-cadscript@0.1.2", "mcp", "--stdio"]
 }
 ```
 
@@ -661,7 +677,8 @@ Or install manually:
 ```sh
 codex plugin marketplace add ricokahler/onshape-cadscript --sparse .agents/plugins
 codex plugin add onshape-cadscript@onshape-cadscript
-npx -y onshape-cadscript@0.1.1 setup codex
+npx -y onshape-cadscript@0.1.2 setup codex
+npx -y onshape-cadscript@0.1.2 setup chrome
 ```
 
 Continue with [Codex setup](./codex) and [Chrome bridge setup](./chrome).
@@ -675,10 +692,11 @@ Source: troubleshooting.md
 
 ## `cadscript doctor` cannot connect
 
-- Confirm the extension is enabled.
+- Confirm the unpacked extension is enabled.
 - Open a signed-in `cad.onshape.com` document tab.
-- Re-run `cadscript bridge install --extension-id <id>` after changing extension installs.
-- Restart Chrome so it reconnects to the native host.
+- Re-run `cadscript setup chrome` after changing package versions.
+- Click **Reload** on the extension card in `chrome://extensions`.
+- Restart Chrome if it still does not reconnect to the native host.
 - Check that another process is not using localhost port `27183`.
 
 ## Plan says the Part Studio is not empty

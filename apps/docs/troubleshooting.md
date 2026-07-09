@@ -2,10 +2,11 @@
 
 ## `cadscript doctor` cannot connect
 
-- Confirm the extension is enabled.
+- Confirm the unpacked extension is enabled.
 - Open a signed-in `cad.onshape.com` document tab.
-- Re-run `cadscript bridge install --extension-id <id>` after changing extension installs.
-- Restart Chrome so it reconnects to the native host.
+- Re-run `cadscript setup chrome` after changing package versions.
+- Click **Reload** on the extension card in `chrome://extensions`.
+- Restart Chrome if it still does not reconnect to the native host.
 - Check that another process is not using localhost port `27183`.
 
 ## Plan says the Part Studio is not empty

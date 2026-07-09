@@ -2,24 +2,40 @@
 
 CadScript uses the Onshape session already signed in to Chrome. It does not ask for a password or API key.
 
-## Chrome Web Store
+## Prepare The Local Extension
 
-The public listing link will appear here after Chrome Web Store review. Chrome requires store distribution for normal public installation; see [Chrome's distribution guidance](https://developer.chrome.com/docs/extensions/how-to/distribute). Until review completes:
-
-1. Download the extension ZIP from the GitHub release.
-2. Unzip it.
-3. Open `chrome://extensions`.
-4. Enable Developer mode and choose **Load unpacked**.
-5. Select `extension/chrome` and copy the extension ID.
-
-Register the native host:
+Run:
 
 ```sh
-cadscript bridge install --extension-id <extension-id>
-cadscript doctor --json
+npx -y onshape-cadscript@0.1.2 setup chrome
 ```
 
-Open an Onshape document in Chrome before running the health check.
+CadScript copies the bundled Manifest V3 extension to:
+
+```text
+~/Library/Application Support/onshape-cadscript/chrome-extension
+```
+
+It also registers the native messaging host for the extension's stable ID and opens both the directory and `chrome://extensions`.
+
+1. Enable **Developer mode** in Chrome.
+2. Click **Load unpacked**.
+3. Select the prepared `chrome-extension` directory.
+4. Open an Onshape document and sign in normally.
+5. Run `cadscript doctor --json`.
+
+Loading the unpacked directory is the only manual installation step. The extension ID is fixed by its public manifest key, so users do not copy IDs and native-host permissions do not drift between versions.
+
+## Updating
+
+Chrome does not automatically update unpacked extensions. After updating the npm package:
+
+1. Run `npx -y onshape-cadscript@latest setup chrome` again.
+2. Open `chrome://extensions`.
+3. Click **Reload** on Onshape CadScript Bridge.
+4. Run `cadscript doctor --json`.
+
+For custom extension builds, `cadscript bridge install --extension-id <id>` remains available as an explicit development override.
 
 ## Boundaries
 

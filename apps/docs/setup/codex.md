@@ -5,7 +5,7 @@ The plugin bundles the CadScript skill and launches the matching MCP server with
 ```json
 {
   "command": "npx",
-  "args": ["-y", "onshape-cadscript@0.1.1", "mcp", "--stdio"]
+  "args": ["-y", "onshape-cadscript@0.1.2", "mcp", "--stdio"]
 }
 ```
 

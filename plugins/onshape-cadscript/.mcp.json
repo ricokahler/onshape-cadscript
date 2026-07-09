@@ -2,7 +2,7 @@
   "mcpServers": {
     "onshape-cadscript": {
       "command": "npx",
-      "args": ["-y", "onshape-cadscript@0.1.1", "mcp", "--stdio"]
+      "args": ["-y", "onshape-cadscript@0.1.2", "mcp", "--stdio"]
     }
   }
 }

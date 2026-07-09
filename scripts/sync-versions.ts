@@ -56,6 +56,7 @@ await writeFormatted(
 
 for (const path of [
   "README.md",
+  "apps/docs/setup/chrome.md",
   "apps/docs/setup/index.md",
   "apps/docs/setup/codex.md",
   "plugins/onshape-cadscript/skills/onshape-cadscript/SKILL.md",
