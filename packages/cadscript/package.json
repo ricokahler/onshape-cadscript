@@ -1,6 +1,6 @@
 {
   "name": "onshape-cadscript",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Script-first Onshape CAD for Codex and hobby 3D printing",
   "type": "module",
   "license": "MIT",
@@ -25,6 +25,7 @@
   },
   "bin": {
     "cadscript": "dist/cli.js",
+    "onshape-cadscript": "dist/cli.js",
     "onshape-cadscript-mcp": "dist/mcp.js"
   },
   "exports": {

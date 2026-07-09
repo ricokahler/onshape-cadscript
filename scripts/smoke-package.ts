@@ -1,5 +1,5 @@
 import { execFile, spawn } from "node:child_process";
-import { mkdir, mkdtemp, readdir, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
@@ -7,6 +7,9 @@ import { promisify } from "node:util";
 const exec = promisify(execFile);
 const root = resolve(import.meta.dirname, "..");
 const temporary = await mkdtemp(join(tmpdir(), "onshape-cadscript-smoke-"));
+const packageJson = JSON.parse(
+  await readFile(resolve(root, "packages/cadscript/package.json"), "utf8"),
+) as { version: string };
 
 try {
   const tarballs = join(temporary, "tarballs");
@@ -22,7 +25,11 @@ try {
 
   const bin = join(install, "node_modules", ".bin");
   const cli = await exec(join(bin, "cadscript"), ["--version"]);
-  if (cli.stdout.trim() !== "0.1.0") throw new Error(`Unexpected CLI version: ${cli.stdout}`);
+  if (cli.stdout.trim() !== packageJson.version)
+    throw new Error(`Unexpected CLI version: ${cli.stdout}`);
+  const packageNameCli = await exec(join(bin, "onshape-cadscript"), ["--version"]);
+  if (packageNameCli.stdout.trim() !== packageJson.version)
+    throw new Error(`Unexpected package-name CLI version: ${packageNameCli.stdout}`);
 
   await new Promise<void>((resolvePromise, reject) => {
     const child = spawn(join(bin, "onshape-cadscript-mcp"), [], {

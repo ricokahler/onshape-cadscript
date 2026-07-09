@@ -28,7 +28,7 @@ Call `cadscript_project_inspect` before editing. Read `cadscript.config.ts`, `mo
 If no project exists, run:
 
 ```sh
-npx -y onshape-cadscript@0.1.0 init ./my-print
+npx -y onshape-cadscript@0.1.1 init ./my-print
 ```
 
 ### 2. Edit The Model

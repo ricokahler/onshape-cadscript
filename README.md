@@ -43,7 +43,7 @@ codex plugin add onshape-cadscript@onshape-cadscript
 The convenience installer runs those same supported Codex commands and verifies the result:
 
 ```sh
-npx -y onshape-cadscript@0.1.0 setup codex
+npx -y onshape-cadscript@0.1.1 setup codex
 ```
 
 Then start a new Codex task and ask for a CAD model. The bundled skill guides Codex through inspect, edit, preview, plan, exact apply, render, measure, no-op verification, and STL export.

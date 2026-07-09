@@ -1,6 +1,6 @@
 {
   "name": "onshape-cadscript",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Design and verify printable Onshape models with a script-first CadScript workflow.",
   "author": {
     "name": "Rico Kahler",

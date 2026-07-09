@@ -19,7 +19,7 @@ Or install manually:
 ```sh
 codex plugin marketplace add ricokahler/onshape-cadscript --sparse .agents/plugins
 codex plugin add onshape-cadscript@onshape-cadscript
-npx -y onshape-cadscript@0.1.0 setup codex
+npx -y onshape-cadscript@0.1.1 setup codex
 ```
 
 Continue with [Codex setup](./codex) and [Chrome bridge setup](./chrome).

@@ -13,6 +13,7 @@ import { startMcpServer } from "./mcp.js";
 import { OnshapeClient } from "./onshape/client.js";
 import { applyPlan, createPlan, planSummary, readPlan, writePlan } from "./runtime/planner.js";
 import { loadProject, readProjectState, writeStarterProject } from "./runtime/project.js";
+import { CADSCRIPT_VERSION } from "./version.js";
 
 function client(): OnshapeClient {
   return new OnshapeClient(new BridgeTransport());
@@ -47,7 +48,7 @@ async function run(command: string, args: string[]): Promise<void> {
 const program = new Command()
   .name("cadscript")
   .description("Script-first Onshape CAD for Codex and hobby 3D printing")
-  .version("0.1.0");
+  .version(CADSCRIPT_VERSION);
 
 program
   .command("init")

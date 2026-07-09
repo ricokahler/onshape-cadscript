@@ -27,7 +27,7 @@
     "packages:smoke": "tsx scripts/smoke-package.ts",
     "plugin:validate": "python3 scripts/validate-plugin.py",
     "changeset": "changeset",
-    "version-packages": "changeset version",
+    "version-packages": "changeset version && tsx scripts/sync-versions.ts && pnpm install && pnpm docs:prepare",
     "release": "pnpm build && changeset publish"
   },
   "devDependencies": {

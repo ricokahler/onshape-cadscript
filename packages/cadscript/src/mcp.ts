@@ -9,6 +9,7 @@ import { renderSketchSvg } from "./core/preview.js";
 import { OnshapeClient } from "./onshape/client.js";
 import { applyPlan, createPlan, planSummary, readPlan, writePlan } from "./runtime/planner.js";
 import { loadProject, readProjectState } from "./runtime/project.js";
+import { CADSCRIPT_VERSION } from "./version.js";
 
 const cwdSchema = {
   cwd: z
@@ -45,7 +46,7 @@ function bridgeAndClient() {
 }
 
 export async function startMcpServer(): Promise<void> {
-  const server = new McpServer({ name: "onshape-cadscript", version: "0.1.0" });
+  const server = new McpServer({ name: "onshape-cadscript", version: CADSCRIPT_VERSION });
 
   server.registerTool(
     "cadscript_project_inspect",

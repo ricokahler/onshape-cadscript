@@ -3,6 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import { createJiti } from "jiti";
 import { z } from "zod";
 import type { ModelDefinition, ParameterSpecs } from "../core/types.js";
+import { CADSCRIPT_VERSION } from "../version.js";
 
 export interface OnshapeTarget {
   readonly documentId: string;
@@ -110,7 +111,7 @@ export async function writeStarterProject(root: string, name: string): Promise<v
     private: true,
     type: "module",
     scripts: { plan: "cadscript plan", apply: "cadscript apply", preview: "cadscript preview" },
-    dependencies: { "onshape-cadscript": "^0.1.0" },
+    dependencies: { "onshape-cadscript": `^${CADSCRIPT_VERSION}` },
   };
   await writeFile(join(root, "package.json"), `${JSON.stringify(packageJson, null, 2)}\n`);
   await writeFile(

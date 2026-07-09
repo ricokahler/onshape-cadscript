@@ -7,5 +7,6 @@ export { renderSketchPng, renderSketchSvg } from "./core/preview.js";
 export { compileFeature } from "./core/compiler.js";
 export type { FeatureIdResolver } from "./core/compiler.js";
 export { defineProject } from "./runtime/project.js";
+export { CADSCRIPT_VERSION } from "./version.js";
 export type * from "./core/types.js";
 export type { CadScriptConfig, OnshapeTarget } from "./runtime/project.js";
