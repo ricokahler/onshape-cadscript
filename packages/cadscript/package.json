@@ -24,8 +24,8 @@
     "node": ">=22.14.0"
   },
   "bin": {
-    "cadscript": "./dist/cli.js",
-    "onshape-cadscript-mcp": "./dist/mcp.js"
+    "cadscript": "dist/cli.js",
+    "onshape-cadscript-mcp": "dist/mcp.js"
   },
   "exports": {
     ".": {
