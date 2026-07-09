@@ -20,7 +20,10 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm assets:render
       - run: pnpm build
-      - run: ditto -c -k --sequesterRsrc extension/chrome onshape-cadscript-chrome.zip
+      - run: >-
+          zip -r -X ../../onshape-cadscript-chrome.zip
+          manifest.json content.js popup.html popup.js selection-adapter.js service-worker.js icons
+        working-directory: extension/chrome
       - run: npm pack --pack-destination ../..
         working-directory: packages/cadscript
       - run: npm pack --pack-destination ../..
