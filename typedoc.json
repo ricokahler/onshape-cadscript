@@ -1,0 +1,10 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": ["packages/cadscript/src/index.ts"],
+  "tsconfig": "packages/cadscript/tsconfig.json",
+  "out": "apps/docs/public/api",
+  "readme": "packages/cadscript/README.md",
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "plugin": []
+}

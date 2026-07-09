@@ -1,0 +1,21 @@
+name: Feature request
+description: Propose a modeling capability or workflow improvement.
+title: "[feature] "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Printable use case
+      description: What are you trying to make and verify?
+    validations:
+      required: true
+  - type: textarea
+    id: onshape
+    attributes:
+      label: Onshape surface
+      description: Link to public Onshape documentation or a generic example when available.
+  - type: textarea
+    id: api
+    attributes:
+      label: Proposed CadScript API

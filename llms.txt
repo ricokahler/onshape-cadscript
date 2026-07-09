@@ -1,0 +1,24 @@
+# Onshape CadScript
+
+Canonical docs: https://ricokahler.github.io/onshape-cadscript/
+Repository: https://github.com/ricokahler/onshape-cadscript
+SDK package: https://www.npmjs.com/package/onshape-cadscript
+Codex plugin package: https://www.npmjs.com/package/onshape-cadscript-codex
+
+Install for Codex:
+codex plugin marketplace add ricokahler/onshape-cadscript --sparse .agents/plugins
+codex plugin add onshape-cadscript@onshape-cadscript
+
+Model workflow: inspect -> edit model.ts -> preview -> plan -> apply exact plan ID -> render -> measure -> require no-op next plan -> export STL.
+
+Safety rules:
+- Use one dedicated Part Studio per model.
+- Never request an Onshape password, cookie, or API key.
+- Never apply without an exact fresh plan ID.
+- Treat sketch warnings as errors.
+- Inspect rendered image content and measured bounds before STL export.
+
+Primary API: defineModel, length/angle, parameter helpers, sketch AST helpers, typed cad feature/query methods.
+Primary MCP tools: cadscript_project_inspect, cadscript_sketch_preview, cadscript_bridge_health, onshape_documents, onshape_project_create, onshape_selection, onshape_partstudio_observe, cadscript_model_plan, cadscript_model_apply, onshape_render, onshape_measure, onshape_export_stl.
+
+Unofficial community project; not affiliated with Onshape or PTC.

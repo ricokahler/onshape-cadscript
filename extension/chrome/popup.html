@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Onshape CadScript Bridge</title>
+    <style>
+      body {
+        width: 260px;
+        margin: 0;
+        padding: 16px;
+        font:
+          13px/1.45 system-ui,
+          sans-serif;
+        color: #111827;
+      }
+      h1 {
+        margin: 0 0 12px;
+        font-size: 15px;
+      }
+      dl {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        margin: 0;
+      }
+      dt {
+        color: #6b7280;
+      }
+      dd {
+        margin: 0;
+        font-weight: 600;
+      }
+      .ok {
+        color: #15803d;
+      }
+      .bad {
+        color: #b91c1c;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Onshape CadScript Bridge</h1>
+    <dl>
+      <dt>Native host</dt>
+      <dd id="host">Checking</dd>
+      <dt>Onshape tabs</dt>
+      <dd id="tabs">0</dd>
+      <dt>Requests</dt>
+      <dd id="requests">0</dd>
+    </dl>
+    <script src="popup.js"></script>
+  </body>
+</html>

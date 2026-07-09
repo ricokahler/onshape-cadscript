@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360">
+  <rect width="1200" height="360" rx="28" fill="#F8FAFC"/>
+  <g transform="translate(40 36) scale(.56)">
+    <rect width="512" height="512" rx="88" fill="#102A43"/>
+    <path d="M130 134h252v70H200v108h182v70H130z" fill="#F8FAFC"/>
+    <path d="M270 218h112v70H270z" fill="#19A974"/>
+    <circle cx="164" cy="347" r="35" fill="#19A974"/>
+  </g>
+  <text x="365" y="166" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="700" fill="#102A43">Onshape CadScript</text>
+  <text x="368" y="224" font-family="Arial, Helvetica, sans-serif" font-size="30" fill="#486581">Script-first CAD for printable ideas</text>
+</svg>

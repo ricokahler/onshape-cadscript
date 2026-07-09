@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <rect width="1600" height="1000" fill="#F8FAFC"/>
+  <text x="90" y="110" font-family="Arial" font-size="58" font-weight="700" fill="#102A43">From one model file to a verified print</text>
+  <g font-family="Arial" font-size="28" text-anchor="middle">
+    <g transform="translate(90 210)"><rect width="260" height="170" rx="8" fill="#fff" stroke="#BCCCDC" stroke-width="3"/><text x="130" y="78" fill="#102A43">Edit model.ts</text><text x="130" y="120" font-size="22" fill="#627D98">typed yield* DSL</text></g>
+    <g transform="translate(440 210)"><rect width="260" height="170" rx="8" fill="#fff" stroke="#BCCCDC" stroke-width="3"/><text x="130" y="78" fill="#102A43">Preview</text><text x="130" y="120" font-size="22" fill="#627D98">shared sketch AST</text></g>
+    <g transform="translate(790 210)"><rect width="260" height="170" rx="8" fill="#fff" stroke="#19A974" stroke-width="4"/><text x="130" y="78" fill="#102A43">Plan</text><text x="130" y="120" font-size="22" fill="#627D98">read-only exact diff</text></g>
+    <g transform="translate(1140 210)"><rect width="260" height="170" rx="8" fill="#102A43"/><text x="130" y="78" fill="#fff">Apply</text><text x="130" y="120" font-size="22" fill="#9FB3C8">stale-safe checkpoint</text></g>
+  </g>
+  <g stroke="#19A974" stroke-width="8" fill="none"><path d="M350 295h80"/><path d="M700 295h80"/><path d="M1050 295h80"/></g>
+  <rect x="90" y="480" width="1310" height="390" rx="8" fill="#102A43"/>
+  <text x="145" y="555" font-family="monospace" font-size="25" fill="#9FB3C8">async *build(cad, p) &#123;</text>
+  <text x="185" y="615" font-family="monospace" font-size="25" fill="#F8FAFC">const profile = yield* cad.sketch(&#123; id: "profile", ... &#125;);</text>
+  <text x="185" y="675" font-family="monospace" font-size="25" fill="#F8FAFC">const body = yield* cad.extrude(&#123; id: "body", profile, depth: p.depth &#125;);</text>
+  <text x="185" y="735" font-family="monospace" font-size="25" fill="#19A974">yield* cad.fillet(&#123; id: "edges", edges: cad.edges(body), radius: 3 &#125;);</text>
+  <text x="145" y="795" font-family="monospace" font-size="25" fill="#9FB3C8">&#125;</text>
+</svg>

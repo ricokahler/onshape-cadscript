@@ -1,0 +1,45 @@
+{
+  "name": "onshape-cadscript-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.12.4",
+  "engines": {
+    "node": ">=22.14.0"
+  },
+  "scripts": {
+    "build": "pnpm --dir packages/cadscript build && pnpm docs:build",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "lint": "eslint .",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "validate": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm packages:check && pnpm packages:smoke && pnpm plugin:validate",
+    "coverage:generate": "tsx scripts/generate-coverage.ts",
+    "docs:dev": "pnpm --dir apps/docs dev",
+    "docs:prepare": "pnpm coverage:generate && pnpm docs:snippets && pnpm docs:llms && typedoc",
+    "docs:build": "pnpm docs:prepare && pnpm --dir apps/docs build",
+    "docs:llms": "tsx scripts/generate-llms.ts",
+    "docs:snippets": "tsx scripts/generate-snippets.ts",
+    "assets:render": "tsx scripts/render-assets.ts",
+    "packages:check": "tsx scripts/check-packages.ts",
+    "packages:smoke": "tsx scripts/smoke-package.ts",
+    "plugin:validate": "python3 scripts/validate-plugin.py",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.5",
+    "@resvg/resvg-js": "^2.6.2",
+    "@eslint/js": "^9.30.1",
+    "@types/node": "^22.15.34",
+    "eslint": "^9.30.1",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.3",
+    "typedoc": "^0.28.7",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.35.1",
+    "vitest": "^3.2.4"
+  }
+}

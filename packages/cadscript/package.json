@@ -1,0 +1,65 @@
+{
+  "name": "onshape-cadscript",
+  "version": "0.1.0",
+  "description": "Script-first Onshape CAD for Codex and hobby 3D printing",
+  "type": "module",
+  "license": "MIT",
+  "author": "Rico Kahler",
+  "homepage": "https://ricokahler.github.io/onshape-cadscript/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ricokahler/onshape-cadscript.git",
+    "directory": "packages/cadscript"
+  },
+  "bugs": "https://github.com/ricokahler/onshape-cadscript/issues",
+  "keywords": [
+    "onshape",
+    "cad",
+    "3d-printing",
+    "codex",
+    "mcp",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=22.14.0"
+  },
+  "bin": {
+    "cadscript": "./dist/cli.js",
+    "onshape-cadscript-mcp": "./dist/mcp.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup && tsx ../../scripts/copy-extension.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "dev": "tsx src/cli.ts",
+    "prepack": "pnpm build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.0",
+    "@resvg/resvg-js": "^2.6.2",
+    "commander": "^14.0.0",
+    "fast-xml-parser": "^5.2.5",
+    "jiti": "^2.4.2",
+    "svg-pathdata": "^8.0.0",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

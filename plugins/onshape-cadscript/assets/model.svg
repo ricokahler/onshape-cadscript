@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+  <rect width="1600" height="1000" fill="#F8FAFC"/>
+  <text x="90" y="110" font-family="Arial" font-size="58" font-weight="700" fill="#102A43">Render, measure, and verify before export</text>
+  <g transform="translate(190 230)">
+    <path d="M100 380 420 190 970 320 650 520z" fill="#D9E2EC" stroke="#102A43" stroke-width="5"/>
+    <path d="M100 380v170l550 150V520z" fill="#9FB3C8" stroke="#102A43" stroke-width="5"/>
+    <path d="M650 520v180l320-205V320z" fill="#627D98" stroke="#102A43" stroke-width="5"/>
+    <ellipse cx="535" cy="362" rx="125" ry="72" fill="#F8FAFC" stroke="#19A974" stroke-width="18"/>
+    <rect x="205" y="335" width="100" height="75" rx="20" fill="#F8FAFC" stroke="#102A43" stroke-width="5"/>
+  </g>
+  <g font-family="Arial" font-size="25" fill="#102A43">
+    <text x="1090" y="330">Bounds</text><text x="1090" y="370" font-family="monospace">120 x 72 x 18 mm</text>
+    <text x="1090" y="460">Regeneration</text><text x="1090" y="500" font-family="monospace" fill="#15803D">clean</text>
+    <text x="1090" y="590">Next plan</text><text x="1090" y="630" font-family="monospace" fill="#15803D">no changes</text>
+    <text x="1090" y="720">Export</text><text x="1090" y="760" font-family="monospace">print.stl</text>
+  </g>
+</svg>

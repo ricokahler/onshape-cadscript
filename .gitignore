@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.cadscript/
+.vitepress/cache/
+.vitepress/dist/
+.DS_Store
+*.tgz
+*.zip
+.env
+.env.*
+!.env.example
+extension/chrome/private-key.pem

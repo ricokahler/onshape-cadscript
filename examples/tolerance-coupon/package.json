@@ -1,0 +1,12 @@
+{
+  "name": "@onshape-cadscript/example-tolerance-coupon",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "onshape-cadscript": "workspace:*"
+  }
+}

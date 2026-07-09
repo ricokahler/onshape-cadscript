@@ -1,0 +1,31 @@
+name: Bug report
+description: Report a reproducible CadScript problem without private CAD data.
+title: "[bug] "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include Onshape cookies, bridge tokens, passwords, private document links, or proprietary model files.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Minimal reproduction
+      description: Include a small public model when possible.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: CadScript version
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Redacted doctor output

@@ -1,0 +1,10 @@
+changelog:
+  categories:
+    - title: Modeling
+      labels: [modeling, enhancement]
+    - title: Bridge and integrations
+      labels: [bridge, codex, chrome]
+    - title: Fixes
+      labels: [bug]
+    - title: Other
+      labels: ["*"]

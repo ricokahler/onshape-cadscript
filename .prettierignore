@@ -1,0 +1,7 @@
+dist
+node_modules
+pnpm-lock.yaml
+coverage.json
+apps/docs/.vitepress/cache
+apps/docs/.vitepress/dist
+apps/docs/public/api

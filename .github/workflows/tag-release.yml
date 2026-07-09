@@ -1,0 +1,31 @@
+name: Tagged release assets
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  assets:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: pnpm
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm assets:render
+      - run: pnpm build
+      - run: ditto -c -k --sequesterRsrc extension/chrome onshape-cadscript-chrome.zip
+      - run: npm pack --pack-destination ../..
+        working-directory: packages/cadscript
+      - run: npm pack --pack-destination ../..
+        working-directory: plugins/onshape-cadscript
+      - run: shasum -a 256 *.tgz *.zip > SHA256SUMS.txt
+      - run: gh release create "$GITHUB_REF_NAME" *.tgz *.zip SHA256SUMS.txt COVERAGE.md --verify-tag --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

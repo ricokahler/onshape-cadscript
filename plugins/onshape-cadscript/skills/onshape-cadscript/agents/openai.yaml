@@ -1,0 +1,7 @@
+interface:
+  display_name: "Onshape CadScript"
+  short_description: "Create printable Onshape CAD models with Codex"
+  brand_color: "#19A974"
+  default_prompt: "Use $onshape-cadscript to create a printable CAD model in Onshape."
+policy:
+  allow_implicit_invocation: true

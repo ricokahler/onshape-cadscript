@@ -1,0 +1,36 @@
+{
+  "name": "onshape-cadscript",
+  "version": "0.1.0",
+  "description": "Design and verify printable Onshape models with a script-first CadScript workflow.",
+  "author": {
+    "name": "Rico Kahler",
+    "url": "https://github.com/ricokahler"
+  },
+  "homepage": "https://ricokahler.github.io/onshape-cadscript/",
+  "repository": "https://github.com/ricokahler/onshape-cadscript",
+  "license": "MIT",
+  "keywords": ["onshape", "cad", "3d-printing", "codex", "mcp"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Onshape CadScript",
+    "shortDescription": "Create printable Onshape models with Codex",
+    "longDescription": "A local-first, script-driven CAD workflow for hobby 3D printing. Codex edits one typed model file, previews sketches, plans exact Onshape changes, applies them through your signed-in browser session, and verifies rendered geometry before export.",
+    "developerName": "Rico Kahler",
+    "category": "Productivity",
+    "capabilities": ["3D modeling", "Onshape", "3D printing"],
+    "websiteURL": "https://ricokahler.github.io/onshape-cadscript/",
+    "privacyPolicyURL": "https://ricokahler.github.io/onshape-cadscript/security/privacy.html",
+    "termsOfServiceURL": "https://ricokahler.github.io/onshape-cadscript/security/terms.html",
+    "defaultPrompt": [
+      "Create a printable Onshape model from my idea.",
+      "Modify this CadScript model and verify the result.",
+      "Make a tolerance test coupon for my printer."
+    ],
+    "brandColor": "#19A974",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/logo.png",
+    "logoDark": "./assets/logo-dark.png",
+    "screenshots": ["./assets/workflow.png", "./assets/model.png"]
+  }
+}

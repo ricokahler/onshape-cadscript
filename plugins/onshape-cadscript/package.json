@@ -1,0 +1,25 @@
+{
+  "name": "onshape-cadscript-codex",
+  "version": "0.1.0",
+  "description": "Codex plugin for Onshape CadScript",
+  "license": "MIT",
+  "author": "Rico Kahler",
+  "homepage": "https://ricokahler.github.io/onshape-cadscript/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ricokahler/onshape-cadscript.git",
+    "directory": "plugins/onshape-cadscript"
+  },
+  "files": [
+    ".codex-plugin",
+    ".mcp.json",
+    "assets",
+    "skills",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}
