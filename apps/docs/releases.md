@@ -20,4 +20,12 @@ The marketplace entry, plugin manifest, MCP package pin, and Chrome extension ve
 - Export a non-empty STL and check expected bounds.
 - Publish signed GitHub release checksums, changelog, npm links, Chrome link, coverage snapshot, and extension ZIP.
 
-After the first manual npm publish, GitHub Actions uses npm trusted publishing with OIDC and provenance.
+After the first manual npm publish, configure both packages to trust
+`.github/workflows/release.yml` in `ricokahler/onshape-cadscript`. Then enable the release job:
+
+```sh
+gh variable set NPM_TRUSTED_PUBLISHING --repo ricokahler/onshape-cadscript --body enabled
+```
+
+GitHub Actions can then publish with OIDC and provenance. Until that explicit handoff, the release
+job remains skipped so ordinary `main` builds stay green.
