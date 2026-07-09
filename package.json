@@ -10,6 +10,7 @@
   "scripts": {
     "build": "pnpm --dir packages/cadscript build && pnpm docs:build",
     "typecheck": "pnpm -r --if-present typecheck",
+    "pretest": "pnpm --dir packages/cadscript build",
     "test": "pnpm -r --if-present test",
     "lint": "eslint .",
     "format": "prettier --check .",
