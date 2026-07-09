@@ -1,5 +1,11 @@
 # onshape-cadscript
 
+## 0.1.3
+
+### Patch Changes
+
+- Refresh the configured Git marketplace before installing the Codex plugin and verify the exact synchronized plugin version.
+
 ## 0.1.2
 
 ### Patch Changes

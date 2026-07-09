@@ -9,7 +9,7 @@
       "source": {
         "source": "npm",
         "package": "onshape-cadscript-codex",
-        "version": "0.1.2",
+        "version": "0.1.3",
         "registry": "https://registry.npmjs.org"
       },
       "policy": {

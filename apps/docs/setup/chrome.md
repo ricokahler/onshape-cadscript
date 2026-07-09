@@ -7,7 +7,7 @@ CadScript uses the Onshape session already signed in to Chrome. It does not ask 
 Run:
 
 ```sh
-npx -y onshape-cadscript@0.1.2 setup chrome
+npx -y onshape-cadscript@0.1.3 setup chrome
 ```
 
 CadScript copies the bundled Manifest V3 extension to:

@@ -97,10 +97,16 @@ setup.command("codex").action(async () => {
     "--sparse",
     ".agents/plugins",
   ]);
+  await run("codex", ["plugin", "marketplace", "upgrade", "onshape-cadscript"]);
   await run("codex", ["plugin", "add", "onshape-cadscript@onshape-cadscript"]);
   const { stdout } = await exec("codex", ["plugin", "list"]);
-  if (!stdout.includes("onshape-cadscript")) {
-    throw new Error("Codex did not report the Onshape CadScript plugin after installation");
+  const installedPlugin = stdout
+    .split("\n")
+    .find((line) => line.includes("onshape-cadscript@onshape-cadscript"));
+  if (!installedPlugin?.includes(CADSCRIPT_VERSION)) {
+    throw new Error(
+      `Codex did not report Onshape CadScript ${CADSCRIPT_VERSION} after installation`,
+    );
   }
   process.stdout.write(
     "Installed the Onshape CadScript Codex plugin. Run cadscript setup chrome next.\n",

@@ -43,7 +43,7 @@ codex plugin add onshape-cadscript@onshape-cadscript
 The convenience installer runs those same supported Codex commands and verifies the result:
 
 ```sh
-npx -y onshape-cadscript@0.1.2 setup codex
+npx -y onshape-cadscript@0.1.3 setup codex
 ```
 
 Then start a new Codex task and ask for a CAD model. The bundled skill guides Codex through inspect, edit, preview, plan, exact apply, render, measure, no-op verification, and STL export.
@@ -55,7 +55,7 @@ CadScript does not receive your Onshape password or an API key. A narrow Chrome 
 Prepare the extension and native host:
 
 ```sh
-npx -y onshape-cadscript@0.1.2 setup chrome
+npx -y onshape-cadscript@0.1.3 setup chrome
 ```
 
 The command opens Chrome's Extensions page and reveals the prepared extension directory. Enable Developer Mode, click **Load unpacked**, and select that directory. Then open Onshape, sign in normally, and run `cadscript doctor --json`.
