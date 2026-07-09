@@ -5,6 +5,7 @@
 Write one typed TypeScript model, let Codex iterate on it with you, and deploy it into a dedicated Onshape Part Studio through your existing signed-in Chrome session.
 
 <!-- coverage:start -->
+
 [![Stable coverage](https://img.shields.io/badge/stable-22-19A974)](./COVERAGE.md) [![Experimental coverage](https://img.shields.io/badge/experimental-24-D97706)](./COVERAGE.md) [![Roadmap](https://img.shields.io/badge/planned-8-627D98)](./ROADMAP.md)
 <!-- coverage:end -->
 

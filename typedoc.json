@@ -4,6 +4,7 @@
   "tsconfig": "packages/cadscript/tsconfig.json",
   "out": "apps/docs/public/api",
   "readme": "packages/cadscript/README.md",
+  "gitRevision": "main",
   "excludePrivate": true,
   "excludeInternal": true,
   "plugin": []

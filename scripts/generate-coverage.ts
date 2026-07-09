@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { format, resolveConfig } from "prettier";
 import {
   coverageCatalog,
   type CoverageArea,
@@ -81,7 +82,11 @@ ${table(coverageCatalog.filter((entry) => entry.milestone === "v1.0"))}
 async function output(path: string, content: string) {
   const absolute = resolve(root, path);
   await mkdir(dirname(absolute), { recursive: true });
-  await writeFile(absolute, `${content.trim()}\n`);
+  const prettierConfig = (await resolveConfig(absolute)) ?? {};
+  await writeFile(
+    absolute,
+    await format(`${content.trim()}\n`, { ...prettierConfig, filepath: absolute }),
+  );
 }
 
 await output("COVERAGE.md", coverage);
@@ -97,9 +102,14 @@ const readmePath = resolve(root, "README.md");
 try {
   const readme = await readFile(readmePath, "utf8");
   const summary = `<!-- coverage:start -->\n[![Stable coverage](https://img.shields.io/badge/stable-${counts.stable}-19A974)](./COVERAGE.md) [![Experimental coverage](https://img.shields.io/badge/experimental-${counts.experimental}-D97706)](./COVERAGE.md) [![Roadmap](https://img.shields.io/badge/planned-${counts.planned}-627D98)](./ROADMAP.md)\n<!-- coverage:end -->`;
+  const nextReadme = readme.replace(
+    /<!-- coverage:start -->[\s\S]*?<!-- coverage:end -->/,
+    summary,
+  );
+  const prettierConfig = (await resolveConfig(readmePath)) ?? {};
   await writeFile(
     readmePath,
-    readme.replace(/<!-- coverage:start -->[\s\S]*?<!-- coverage:end -->/, summary),
+    await format(nextReadme, { ...prettierConfig, filepath: readmePath }),
   );
 } catch (error) {
   if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
