@@ -37,6 +37,31 @@ describe("model runtime", () => {
     expect(JSON.stringify(compiled)).not.toContain('"featureId":"profile"');
   });
 
+  it("places sketches on construction-plane faces without a solid-body filter", async () => {
+    const planeModel = defineModel({
+      name: "plane-sketch",
+      units: "mm",
+      parameters: {},
+      async *build(cad) {
+        const offset = yield* cad.plane({ id: "offset", reference: cad.top, offset: length(2) });
+        yield* cad.sketch({
+          id: "profile",
+          plane: { type: "plane", feature: offset },
+          entities: [sketch.rectangle("outline", [-1, -1], [1, 1])],
+        });
+      },
+    });
+    const result = await materializeModel(planeModel);
+    const compiled = compileFeature(result, result.features[1]!, (id) => `remote-${id}`);
+    const feature = compiled.feature as {
+      parameters: Array<{ queries?: Array<Record<string, unknown>> }>;
+    };
+    const query = feature.parameters[0]!.queries![0]!;
+
+    expect(query.btType).toBe("BTMIndividualQuery-138");
+    expect(query.queryString).toBe('query=qCreatedBy(id + "remote-offset", EntityType.FACE);');
+  });
+
   it("rejects duplicate feature IDs", async () => {
     const invalid = defineModel({
       name: "invalid",

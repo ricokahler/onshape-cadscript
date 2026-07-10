@@ -59,9 +59,10 @@ function planeQuery(plane: PlaneRef, resolve: FeatureIdResolver): Record<string,
   }
   if (plane.feature) {
     return {
-      btType: "BTMIndividualCreatedByQuery-137",
-      featureId: resolve(plane.feature.id),
-      entityType: "FACE",
+      // Construction planes create faces, not solid bodies. The generic query
+      // preserves that face selection instead of adding a body-type filter.
+      btType: "BTMIndividualQuery-138",
+      queryString: `query=qCreatedBy(id + "${resolve(plane.feature.id)}", EntityType.FACE);`,
     };
   }
   throw new Error("Plane reference is empty");
