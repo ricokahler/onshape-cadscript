@@ -7,7 +7,7 @@ CadScript uses the Onshape session already signed in to Chrome. It does not ask 
 Run:
 
 ```sh
-npx -y onshape-cadscript@0.1.3 setup chrome
+npx -y onshape-cadscript@0.1.4 setup chrome
 ```
 
 CadScript copies the bundled Manifest V3 extension to:
@@ -36,6 +36,16 @@ Chrome does not automatically update unpacked extensions. After updating the npm
 4. Run `cadscript doctor --json`.
 
 For custom extension builds, `cadscript bridge install --extension-id <id>` remains available as an explicit development override.
+
+## Uninstalling
+
+Remove the extension card in `chrome://extensions`, then run:
+
+```sh
+cadscript uninstall
+```
+
+That removes the PM2 daemon, its Codex daemon entry, native-host manifests, prepared extension files, and owner-only bridge configuration. It never removes CAD project folders or Onshape documents.
 
 ## Boundaries
 

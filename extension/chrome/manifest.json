@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Onshape CadScript Bridge",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Connects local CadScript tools to the Onshape session already signed in to Chrome.",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0jntLIv920UXY5YKv4sffFma5sgNh21kxXbkGpglVFQuDa4m7AeDOTCDvy3SKWTlqrX3/i7AAXzmAUi9Krl4Ppxc0T3At1GACXy8pabfzwqIXL7ZTnl1CnMWPvEMlsTIwp1NY1VSj1Wo0/w3rwOMkCOsnSk28IhigxWChPgTJiGAYnJT8m1pB1QUB2J9RajmgqqtPl/2upyI1j0gndtNbdfmYx/Hrb5Cpwgf1xQm1kCu43vFxVJ6geMHknuOXWu3KELiyEiulIG53aBZBFGaMvA5OwRYsHeKlMfaQXzXt/+81gs1vq0/8dhWkNdkk3tNIMcg9xjvin2a2ksqHaVJXwIDAQAB",
   "icons": {

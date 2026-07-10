@@ -59,6 +59,7 @@ for (const path of [
   "apps/docs/setup/chrome.md",
   "apps/docs/setup/index.md",
   "apps/docs/setup/codex.md",
+  "apps/docs/setup/daemon.md",
   "plugins/onshape-cadscript/skills/onshape-cadscript/SKILL.md",
 ]) {
   const absolute = resolve(root, path);

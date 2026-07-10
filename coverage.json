@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "counts": {
     "stable": 22,
-    "experimental": 24,
+    "experimental": 27,
     "raw escape hatch": 2,
     "planned": 8,
     "not planned": 0
@@ -166,6 +166,18 @@
     },
     {
       "area": "feature",
+      "id": "feature.extrude-bounds",
+      "capability": "Up-to and two-direction extrude bounds",
+      "onshapeSurface": "extrude bounding parameters",
+      "cadscriptApi": "cad.extrude",
+      "status": "experimental",
+      "tests": "unit + migrated models",
+      "documentation": "features guide",
+      "release": "0.1.4",
+      "milestone": "v0.1"
+    },
+    {
+      "area": "feature",
       "id": "feature.revolve",
       "capability": "Revolve",
       "onshapeSurface": "revolve",
@@ -215,13 +227,25 @@
     {
       "area": "feature",
       "id": "feature.plane",
-      "capability": "Offset construction plane",
+      "capability": "Offset and angular construction planes",
       "onshapeSurface": "cPlane",
       "cadscriptApi": "cad.plane",
       "status": "experimental",
       "tests": "unit",
       "documentation": "guide",
       "release": "0.1.0",
+      "milestone": "v0.1"
+    },
+    {
+      "area": "feature",
+      "id": "feature.split",
+      "capability": "Split part",
+      "onshapeSurface": "splitPart",
+      "cadscriptApi": "cad.split",
+      "status": "experimental",
+      "tests": "unit + migrated model",
+      "documentation": "features guide",
+      "release": "0.1.4",
       "milestone": "v0.1"
     },
     {
@@ -630,6 +654,18 @@
       "tests": "unit",
       "documentation": "guide",
       "release": "0.1.0",
+      "milestone": "v0.1"
+    },
+    {
+      "area": "mcp",
+      "id": "mcp.http-daemon",
+      "capability": "Optional PM2 Streamable HTTP daemon",
+      "onshapeSurface": "loopback MCP transport",
+      "cadscriptApi": "cadscript daemon install",
+      "status": "experimental",
+      "tests": "local HTTP smoke",
+      "documentation": "daemon guide",
+      "release": "0.1.4",
       "milestone": "v0.1"
     },
     {

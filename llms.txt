@@ -11,6 +11,8 @@ codex plugin add onshape-cadscript@onshape-cadscript
 
 Model workflow: inspect -> edit model.ts -> preview -> plan -> apply exact plan ID -> render -> measure -> require no-op next plan -> export STL.
 
+Optional persistent MCP: cadscript daemon install --codex -> http://127.0.0.1:27184/mcp. Remove with cadscript daemon uninstall --codex. Full local cleanup: cadscript uninstall.
+
 Safety rules:
 - Use one dedicated Part Studio per model.
 - Never request an Onshape password, cookie, or API key.

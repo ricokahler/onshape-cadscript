@@ -1,5 +1,11 @@
 # onshape-cadscript-codex
 
+## 0.1.4
+
+### Patch Changes
+
+- Add loopback Streamable HTTP MCP support with an optional PM2 daemon lifecycle and full local cleanup. Expand typed feature coverage for complex printable models, improve meter-unit sketch previews, and document the optional daemon workflow.
+
 ## 0.1.3
 
 ### Patch Changes

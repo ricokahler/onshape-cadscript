@@ -48,6 +48,7 @@ export function createCad(): Cad {
     chamfer: (options) => operation({ kind: "chamfer", ...options }),
     boolean: (options) => operation({ kind: "boolean", ...options }),
     plane: (options) => operation({ kind: "plane", ...options }),
+    split: (options) => operation({ kind: "split", ...options }),
     transform: (options) => operation({ kind: "transform", ...options }),
     shell: (options) => operation({ kind: "shell", ...options }),
     rawFeature: (options) => operation({ kind: "raw", ...options }),

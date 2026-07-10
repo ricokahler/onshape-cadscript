@@ -2,7 +2,7 @@
 
 Generated from `coverage/catalog.ts`. Endpoint availability alone does not count as support; every entry records implementation maturity, tests, documentation, and release intent.
 
-**22 stable** | **24 experimental** | **2 raw escape hatches** | **8 planned**
+**22 stable** | **27 experimental** | **2 raw escape hatches** | **8 planned**
 
 ## SKETCH
 
@@ -22,22 +22,24 @@ Generated from `coverage/catalog.ts`. Endpoint availability alone does not count
 
 ## FEATURE
 
-| Capability                | Onshape surface         | CadScript API    | Status           | Tests   | Docs    | Release | Milestone |
-| ------------------------- | ----------------------- | ---------------- | ---------------- | ------- | ------- | ------- | --------- |
-| Sketch                    | newSketch               | `cad.sketch`     | stable           | unit    | guide   | 0.1.0   | v0.1      |
-| Extrude                   | extrude                 | `cad.extrude`    | stable           | unit    | guide   | 0.1.0   | v0.1      |
-| Revolve                   | revolve                 | `cad.revolve`    | stable           | unit    | guide   | 0.1.0   | v0.1      |
-| Fillet                    | fillet                  | `cad.fillet`     | experimental     | unit    | guide   | 0.1.0   | v0.1      |
-| Chamfer                   | chamfer                 | `cad.chamfer`    | experimental     | unit    | guide   | 0.1.0   | v0.1      |
-| Boolean bodies            | booleanBodies           | `cad.boolean`    | experimental     | unit    | guide   | 0.1.0   | v0.1      |
-| Offset construction plane | cPlane                  | `cad.plane`      | experimental     | unit    | guide   | 0.1.0   | v0.1      |
-| 3D translation            | transform               | `cad.transform`  | experimental     | unit    | guide   | 0.1.0   | v0.1      |
-| Shell                     | shell                   | `cad.shell`      | experimental     | unit    | guide   | 0.1.0   | v0.1      |
-| Raw feature parameters    | feature definition call | `cad.rawFeature` | raw escape hatch | unit    | guide   | 0.1.0   | v0.1      |
-| Loft                      | loft                    | `planned`        | planned          | planned | roadmap | 0.2.0   | v0.2      |
-| Sweep                     | sweep                   | `planned`        | planned          | planned | roadmap | 0.2.0   | v0.2      |
-| Configurations            | configuration API       | `planned`        | planned          | planned | roadmap | 0.3.0   | v0.3      |
-| Assemblies and mates      | assembly APIs           | `planned`        | planned          | planned | roadmap | 0.3.0   | v0.3      |
+| Capability                             | Onshape surface             | CadScript API    | Status           | Tests                  | Docs           | Release | Milestone |
+| -------------------------------------- | --------------------------- | ---------------- | ---------------- | ---------------------- | -------------- | ------- | --------- |
+| Sketch                                 | newSketch                   | `cad.sketch`     | stable           | unit                   | guide          | 0.1.0   | v0.1      |
+| Extrude                                | extrude                     | `cad.extrude`    | stable           | unit                   | guide          | 0.1.0   | v0.1      |
+| Up-to and two-direction extrude bounds | extrude bounding parameters | `cad.extrude`    | experimental     | unit + migrated models | features guide | 0.1.4   | v0.1      |
+| Revolve                                | revolve                     | `cad.revolve`    | stable           | unit                   | guide          | 0.1.0   | v0.1      |
+| Fillet                                 | fillet                      | `cad.fillet`     | experimental     | unit                   | guide          | 0.1.0   | v0.1      |
+| Chamfer                                | chamfer                     | `cad.chamfer`    | experimental     | unit                   | guide          | 0.1.0   | v0.1      |
+| Boolean bodies                         | booleanBodies               | `cad.boolean`    | experimental     | unit                   | guide          | 0.1.0   | v0.1      |
+| Offset and angular construction planes | cPlane                      | `cad.plane`      | experimental     | unit                   | guide          | 0.1.0   | v0.1      |
+| Split part                             | splitPart                   | `cad.split`      | experimental     | unit + migrated model  | features guide | 0.1.4   | v0.1      |
+| 3D translation                         | transform                   | `cad.transform`  | experimental     | unit                   | guide          | 0.1.0   | v0.1      |
+| Shell                                  | shell                       | `cad.shell`      | experimental     | unit                   | guide          | 0.1.0   | v0.1      |
+| Raw feature parameters                 | feature definition call     | `cad.rawFeature` | raw escape hatch | unit                   | guide          | 0.1.0   | v0.1      |
+| Loft                                   | loft                        | `planned`        | planned          | planned                | roadmap        | 0.2.0   | v0.2      |
+| Sweep                                  | sweep                       | `planned`        | planned          | planned                | roadmap        | 0.2.0   | v0.2      |
+| Configurations                         | configuration API           | `planned`        | planned          | planned                | roadmap        | 0.3.0   | v0.3      |
+| Assemblies and mates                   | assembly APIs               | `planned`        | planned          | planned                | roadmap        | 0.3.0   | v0.3      |
 
 ## QUERY
 
@@ -67,19 +69,20 @@ Generated from `coverage/catalog.ts`. Endpoint availability alone does not count
 
 ## MCP
 
-| Capability                  | Onshape surface                 | CadScript API                | Status       | Tests | Docs  | Release | Milestone |
-| --------------------------- | ------------------------------- | ---------------------------- | ------------ | ----- | ----- | ------- | --------- |
-| Project inspection          | local model                     | `cadscript_project_inspect`  | stable       | unit  | guide | 0.1.0   | v0.1      |
-| Bridge health               | local bridge                    | `cadscript_bridge_health`    | stable       | unit  | guide | 0.1.0   | v0.1      |
-| Document navigation         | Documents REST                  | `onshape_documents`          | stable       | unit  | guide | 0.1.0   | v0.1      |
-| Dedicated project creation  | Documents and Part Studios REST | `onshape_project_create`     | experimental | unit  | guide | 0.1.0   | v0.1      |
-| Current selection           | narrow page adapter             | `onshape_selection`          | experimental | unit  | guide | 0.1.0   | v0.1      |
-| Part Studio observation     | Part Studios REST               | `onshape_partstudio_observe` | stable       | unit  | guide | 0.1.0   | v0.1      |
-| Read-only model plan        | local + Part Studios REST       | `cadscript_model_plan`       | stable       | unit  | guide | 0.1.0   | v0.1      |
-| Exact-plan apply and verify | Part Studios REST               | `cadscript_model_apply`      | experimental | unit  | guide | 0.1.0   | v0.1      |
-| Rendered image content      | shaded views                    | `onshape_render`             | stable       | unit  | guide | 0.1.0   | v0.1      |
-| Bounds and mass             | FeatureScript                   | `onshape_measure`            | experimental | unit  | guide | 0.1.0   | v0.1      |
-| Verified STL export         | STL REST                        | `onshape_export_stl`         | stable       | unit  | guide | 0.1.0   | v0.1      |
+| Capability                          | Onshape surface                 | CadScript API                | Status       | Tests            | Docs         | Release | Milestone |
+| ----------------------------------- | ------------------------------- | ---------------------------- | ------------ | ---------------- | ------------ | ------- | --------- |
+| Project inspection                  | local model                     | `cadscript_project_inspect`  | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Bridge health                       | local bridge                    | `cadscript_bridge_health`    | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Document navigation                 | Documents REST                  | `onshape_documents`          | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Dedicated project creation          | Documents and Part Studios REST | `onshape_project_create`     | experimental | unit             | guide        | 0.1.0   | v0.1      |
+| Current selection                   | narrow page adapter             | `onshape_selection`          | experimental | unit             | guide        | 0.1.0   | v0.1      |
+| Part Studio observation             | Part Studios REST               | `onshape_partstudio_observe` | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Read-only model plan                | local + Part Studios REST       | `cadscript_model_plan`       | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Exact-plan apply and verify         | Part Studios REST               | `cadscript_model_apply`      | experimental | unit             | guide        | 0.1.0   | v0.1      |
+| Rendered image content              | shaded views                    | `onshape_render`             | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Bounds and mass                     | FeatureScript                   | `onshape_measure`            | experimental | unit             | guide        | 0.1.0   | v0.1      |
+| Verified STL export                 | STL REST                        | `onshape_export_stl`         | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Optional PM2 Streamable HTTP daemon | loopback MCP transport          | `cadscript daemon install`   | experimental | local HTTP smoke | daemon guide | 0.1.4   | v0.1      |
 
 ## LIVE
 

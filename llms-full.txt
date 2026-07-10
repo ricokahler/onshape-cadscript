@@ -14,7 +14,7 @@ flowchart LR
   A --> P[SVG and PNG preview]
   A --> C[Onshape compiler]
   C --> L[Content-addressed planner]
-  L --> MCP[CLI and MCP]
+  L --> MCP[CLI and MCP stdio or HTTP]
   MCP --> H[Token-protected native host]
   H --> X[Chrome MV3 extension]
   X --> O[Onshape REST in signed-in session]
@@ -28,6 +28,8 @@ The planner compares desired feature IDs and hashes with local ownership state p
 The bridge is deliberately narrow. The local TCP endpoint binds to `127.0.0.1`, checks a random token, negotiates protocol version 1, bounds payloads, times out requests, and forwards only allowlisted Onshape paths. The extension handles REST requests and one fixed selection adapter. There is no generic page evaluator.
 
 One model owns one dedicated Part Studio. Onshape-generated feature IDs stay in local state; model code uses only symbolic IDs.
+
+The optional PM2 daemon owns only a loopback Streamable HTTP MCP process. It does not replace or supervise native messaging: Chrome still launches the native host on demand and owns that process's stdin/stdout channel.
 
 
 ---
@@ -73,7 +75,7 @@ Source: guide/features.md
 
 # Features
 
-v0.1 includes sketch, extrude, revolve, fillet, chamfer, boolean bodies, offset plane, 3D translation, and shell. A raw feature parameter escape hatch exists for experiments but is not stable API.
+v0.1 includes sketch, extrude, revolve, fillet, chamfer, boolean bodies, construction planes, split part, transforms, and shell. Extrudes support blind, symmetric, through-all, up-to-surface, up-to-body, and up-to-vertex bounds plus a second direction. A raw feature parameter escape hatch exists for experiments but is not stable API.
 
 ```ts
 const body =
@@ -89,6 +91,21 @@ yield *
     id: "outer-round",
     edges: cad.edges(body),
     radius: length(2),
+  });
+
+const splitPlane =
+  yield *
+  cad.plane({
+    id: "split-plane",
+    reference: cad.top,
+    offset: length(8),
+  });
+
+yield *
+  cad.split({
+    id: "split-body",
+    tool: { type: "plane", feature: splitPlane },
+    targets: [cad.bodies(body)],
   });
 ```
 
@@ -284,7 +301,7 @@ Source: reference/coverage.md
 
 Generated from `coverage/catalog.ts`. Endpoint availability alone does not count as support; every entry records implementation maturity, tests, documentation, and release intent.
 
-**22 stable** | **24 experimental** | **2 raw escape hatches** | **8 planned**
+**22 stable** | **27 experimental** | **2 raw escape hatches** | **8 planned**
 
 ## SKETCH
 
@@ -304,22 +321,24 @@ Generated from `coverage/catalog.ts`. Endpoint availability alone does not count
 
 ## FEATURE
 
-| Capability                | Onshape surface         | CadScript API    | Status           | Tests   | Docs    | Release | Milestone |
-| ------------------------- | ----------------------- | ---------------- | ---------------- | ------- | ------- | ------- | --------- |
-| Sketch                    | newSketch               | `cad.sketch`     | stable           | unit    | guide   | 0.1.0   | v0.1      |
-| Extrude                   | extrude                 | `cad.extrude`    | stable           | unit    | guide   | 0.1.0   | v0.1      |
-| Revolve                   | revolve                 | `cad.revolve`    | stable           | unit    | guide   | 0.1.0   | v0.1      |
-| Fillet                    | fillet                  | `cad.fillet`     | experimental     | unit    | guide   | 0.1.0   | v0.1      |
-| Chamfer                   | chamfer                 | `cad.chamfer`    | experimental     | unit    | guide   | 0.1.0   | v0.1      |
-| Boolean bodies            | booleanBodies           | `cad.boolean`    | experimental     | unit    | guide   | 0.1.0   | v0.1      |
-| Offset construction plane | cPlane                  | `cad.plane`      | experimental     | unit    | guide   | 0.1.0   | v0.1      |
-| 3D translation            | transform               | `cad.transform`  | experimental     | unit    | guide   | 0.1.0   | v0.1      |
-| Shell                     | shell                   | `cad.shell`      | experimental     | unit    | guide   | 0.1.0   | v0.1      |
-| Raw feature parameters    | feature definition call | `cad.rawFeature` | raw escape hatch | unit    | guide   | 0.1.0   | v0.1      |
-| Loft                      | loft                    | `planned`        | planned          | planned | roadmap | 0.2.0   | v0.2      |
-| Sweep                     | sweep                   | `planned`        | planned          | planned | roadmap | 0.2.0   | v0.2      |
-| Configurations            | configuration API       | `planned`        | planned          | planned | roadmap | 0.3.0   | v0.3      |
-| Assemblies and mates      | assembly APIs           | `planned`        | planned          | planned | roadmap | 0.3.0   | v0.3      |
+| Capability                             | Onshape surface             | CadScript API    | Status           | Tests                  | Docs           | Release | Milestone |
+| -------------------------------------- | --------------------------- | ---------------- | ---------------- | ---------------------- | -------------- | ------- | --------- |
+| Sketch                                 | newSketch                   | `cad.sketch`     | stable           | unit                   | guide          | 0.1.0   | v0.1      |
+| Extrude                                | extrude                     | `cad.extrude`    | stable           | unit                   | guide          | 0.1.0   | v0.1      |
+| Up-to and two-direction extrude bounds | extrude bounding parameters | `cad.extrude`    | experimental     | unit + migrated models | features guide | 0.1.4   | v0.1      |
+| Revolve                                | revolve                     | `cad.revolve`    | stable           | unit                   | guide          | 0.1.0   | v0.1      |
+| Fillet                                 | fillet                      | `cad.fillet`     | experimental     | unit                   | guide          | 0.1.0   | v0.1      |
+| Chamfer                                | chamfer                     | `cad.chamfer`    | experimental     | unit                   | guide          | 0.1.0   | v0.1      |
+| Boolean bodies                         | booleanBodies               | `cad.boolean`    | experimental     | unit                   | guide          | 0.1.0   | v0.1      |
+| Offset and angular construction planes | cPlane                      | `cad.plane`      | experimental     | unit                   | guide          | 0.1.0   | v0.1      |
+| Split part                             | splitPart                   | `cad.split`      | experimental     | unit + migrated model  | features guide | 0.1.4   | v0.1      |
+| 3D translation                         | transform                   | `cad.transform`  | experimental     | unit                   | guide          | 0.1.0   | v0.1      |
+| Shell                                  | shell                       | `cad.shell`      | experimental     | unit                   | guide          | 0.1.0   | v0.1      |
+| Raw feature parameters                 | feature definition call     | `cad.rawFeature` | raw escape hatch | unit                   | guide          | 0.1.0   | v0.1      |
+| Loft                                   | loft                        | `planned`        | planned          | planned                | roadmap        | 0.2.0   | v0.2      |
+| Sweep                                  | sweep                       | `planned`        | planned          | planned                | roadmap        | 0.2.0   | v0.2      |
+| Configurations                         | configuration API           | `planned`        | planned          | planned                | roadmap        | 0.3.0   | v0.3      |
+| Assemblies and mates                   | assembly APIs               | `planned`        | planned          | planned                | roadmap        | 0.3.0   | v0.3      |
 
 ## QUERY
 
@@ -349,19 +368,20 @@ Generated from `coverage/catalog.ts`. Endpoint availability alone does not count
 
 ## MCP
 
-| Capability                  | Onshape surface                 | CadScript API                | Status       | Tests | Docs  | Release | Milestone |
-| --------------------------- | ------------------------------- | ---------------------------- | ------------ | ----- | ----- | ------- | --------- |
-| Project inspection          | local model                     | `cadscript_project_inspect`  | stable       | unit  | guide | 0.1.0   | v0.1      |
-| Bridge health               | local bridge                    | `cadscript_bridge_health`    | stable       | unit  | guide | 0.1.0   | v0.1      |
-| Document navigation         | Documents REST                  | `onshape_documents`          | stable       | unit  | guide | 0.1.0   | v0.1      |
-| Dedicated project creation  | Documents and Part Studios REST | `onshape_project_create`     | experimental | unit  | guide | 0.1.0   | v0.1      |
-| Current selection           | narrow page adapter             | `onshape_selection`          | experimental | unit  | guide | 0.1.0   | v0.1      |
-| Part Studio observation     | Part Studios REST               | `onshape_partstudio_observe` | stable       | unit  | guide | 0.1.0   | v0.1      |
-| Read-only model plan        | local + Part Studios REST       | `cadscript_model_plan`       | stable       | unit  | guide | 0.1.0   | v0.1      |
-| Exact-plan apply and verify | Part Studios REST               | `cadscript_model_apply`      | experimental | unit  | guide | 0.1.0   | v0.1      |
-| Rendered image content      | shaded views                    | `onshape_render`             | stable       | unit  | guide | 0.1.0   | v0.1      |
-| Bounds and mass             | FeatureScript                   | `onshape_measure`            | experimental | unit  | guide | 0.1.0   | v0.1      |
-| Verified STL export         | STL REST                        | `onshape_export_stl`         | stable       | unit  | guide | 0.1.0   | v0.1      |
+| Capability                          | Onshape surface                 | CadScript API                | Status       | Tests            | Docs         | Release | Milestone |
+| ----------------------------------- | ------------------------------- | ---------------------------- | ------------ | ---------------- | ------------ | ------- | --------- |
+| Project inspection                  | local model                     | `cadscript_project_inspect`  | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Bridge health                       | local bridge                    | `cadscript_bridge_health`    | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Document navigation                 | Documents REST                  | `onshape_documents`          | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Dedicated project creation          | Documents and Part Studios REST | `onshape_project_create`     | experimental | unit             | guide        | 0.1.0   | v0.1      |
+| Current selection                   | narrow page adapter             | `onshape_selection`          | experimental | unit             | guide        | 0.1.0   | v0.1      |
+| Part Studio observation             | Part Studios REST               | `onshape_partstudio_observe` | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Read-only model plan                | local + Part Studios REST       | `cadscript_model_plan`       | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Exact-plan apply and verify         | Part Studios REST               | `cadscript_model_apply`      | experimental | unit             | guide        | 0.1.0   | v0.1      |
+| Rendered image content              | shaded views                    | `onshape_render`             | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Bounds and mass                     | FeatureScript                   | `onshape_measure`            | experimental | unit             | guide        | 0.1.0   | v0.1      |
+| Verified STL export                 | STL REST                        | `onshape_export_stl`         | stable       | unit             | guide        | 0.1.0   | v0.1      |
+| Optional PM2 Streamable HTTP daemon | loopback MCP transport          | `cadscript daemon install`   | experimental | local HTTP smoke | daemon guide | 0.1.4   | v0.1      |
 
 ## LIVE
 
@@ -471,34 +491,37 @@ Generated from `coverage/catalog.ts`.
 
 Parity with the proven generator DSL, secure local browser bridge, CLI and MCP, validated parameters, shared SVG preview/import, STL export, Codex plugin, public packages, documentation, and release smokes.
 
-| Capability                     | Onshape surface                  | CadScript API                         | Status       | Tests               | Docs              | Release | Milestone |
-| ------------------------------ | -------------------------------- | ------------------------------------- | ------------ | ------------------- | ----------------- | ------- | --------- |
-| Circular arc                   | BTMSketchCurveSegment / circle   | `sketch.arc`                          | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Cubic Bezier spline            | control point spline             | `sketch.bezier`                       | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Sketch text                    | BTMSketchTextEntity              | `sketch.text`                         | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| SVG import                     | compiled sketch entities         | `sketch.svg / importSvg`              | experimental | unit + example      | SVG guide         | 0.1.0   | v0.1      |
-| Basic geometric constraints    | BTMSketchConstraint              | `constrain.*`                         | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Fillet                         | fillet                           | `cad.fillet`                          | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Chamfer                        | chamfer                          | `cad.chamfer`                         | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Boolean bodies                 | booleanBodies                    | `cad.boolean`                         | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Offset construction plane      | cPlane                           | `cad.plane`                           | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| 3D translation                 | transform                        | `cad.transform`                       | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Shell                          | shell                            | `cad.shell`                           | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Extrude cap query              | qCapEntity                       | `cad.cap`                             | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Owned-by-body query            | qOwnedByBody                     | `cad.ownedByBody`                     | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Geometry filter                | qGeometry                        | `cad.geometry`                        | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Closest-to query               | qClosestTo                       | `cad.closestTo`                       | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Create document                | Documents: createDocument        | `OnshapeClient.createDocument`        | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Add/update/delete feature      | Part Studios: feature operations | `plan/apply runtime`                  | experimental | unit + live pending | guide             | 0.1.0   | v0.1      |
-| Fixed measurements             | Part Studios: evalFeatureScript  | `OnshapeClient.evaluateFeatureScript` | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Version checkpoint             | Documents: createVersion         | `OnshapeClient.createCheckpoint`      | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Dedicated project creation     | Documents and Part Studios REST  | `onshape_project_create`              | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Current selection              | narrow page adapter              | `onshape_selection`                   | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Exact-plan apply and verify    | Part Studios REST                | `cadscript_model_apply`               | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Bounds and mass                | FeatureScript                    | `onshape_measure`                     | experimental | unit                | guide             | 0.1.0   | v0.1      |
-| Signed-in browser session      | Chrome MV3 + native messaging    | `cadscript doctor`                    | experimental | manual macOS smoke  | setup guide       | 0.1.0   | v0.1      |
-| Plan/apply/render/no-op        | dedicated Part Studio            | `end-to-end smoke`                    | planned      | release gate        | release checklist | 0.1.0   | v0.1      |
-| Clean-machine macOS onboarding | npm + Codex + Chrome             | `release smoke`                       | planned      | release gate        | release checklist | 0.1.0   | v0.1      |
+| Capability                             | Onshape surface                  | CadScript API                         | Status       | Tests                  | Docs              | Release | Milestone |
+| -------------------------------------- | -------------------------------- | ------------------------------------- | ------------ | ---------------------- | ----------------- | ------- | --------- |
+| Circular arc                           | BTMSketchCurveSegment / circle   | `sketch.arc`                          | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Cubic Bezier spline                    | control point spline             | `sketch.bezier`                       | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Sketch text                            | BTMSketchTextEntity              | `sketch.text`                         | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| SVG import                             | compiled sketch entities         | `sketch.svg / importSvg`              | experimental | unit + example         | SVG guide         | 0.1.0   | v0.1      |
+| Basic geometric constraints            | BTMSketchConstraint              | `constrain.*`                         | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Up-to and two-direction extrude bounds | extrude bounding parameters      | `cad.extrude`                         | experimental | unit + migrated models | features guide    | 0.1.4   | v0.1      |
+| Fillet                                 | fillet                           | `cad.fillet`                          | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Chamfer                                | chamfer                          | `cad.chamfer`                         | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Boolean bodies                         | booleanBodies                    | `cad.boolean`                         | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Offset and angular construction planes | cPlane                           | `cad.plane`                           | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Split part                             | splitPart                        | `cad.split`                           | experimental | unit + migrated model  | features guide    | 0.1.4   | v0.1      |
+| 3D translation                         | transform                        | `cad.transform`                       | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Shell                                  | shell                            | `cad.shell`                           | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Extrude cap query                      | qCapEntity                       | `cad.cap`                             | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Owned-by-body query                    | qOwnedByBody                     | `cad.ownedByBody`                     | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Geometry filter                        | qGeometry                        | `cad.geometry`                        | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Closest-to query                       | qClosestTo                       | `cad.closestTo`                       | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Create document                        | Documents: createDocument        | `OnshapeClient.createDocument`        | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Add/update/delete feature              | Part Studios: feature operations | `plan/apply runtime`                  | experimental | unit + live pending    | guide             | 0.1.0   | v0.1      |
+| Fixed measurements                     | Part Studios: evalFeatureScript  | `OnshapeClient.evaluateFeatureScript` | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Version checkpoint                     | Documents: createVersion         | `OnshapeClient.createCheckpoint`      | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Dedicated project creation             | Documents and Part Studios REST  | `onshape_project_create`              | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Current selection                      | narrow page adapter              | `onshape_selection`                   | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Exact-plan apply and verify            | Part Studios REST                | `cadscript_model_apply`               | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Bounds and mass                        | FeatureScript                    | `onshape_measure`                     | experimental | unit                   | guide             | 0.1.0   | v0.1      |
+| Optional PM2 Streamable HTTP daemon    | loopback MCP transport           | `cadscript daemon install`            | experimental | local HTTP smoke       | daemon guide      | 0.1.4   | v0.1      |
+| Signed-in browser session              | Chrome MV3 + native messaging    | `cadscript doctor`                    | experimental | manual macOS smoke     | setup guide       | 0.1.0   | v0.1      |
+| Plan/apply/render/no-op                | dedicated Part Studio            | `end-to-end smoke`                    | planned      | release gate           | release checklist | 0.1.0   | v0.1      |
+| Clean-machine macOS onboarding         | npm + Codex + Chrome             | `release smoke`                       | planned      | release gate           | release checklist | 0.1.0   | v0.1      |
 
 ## v0.2 - Richer Parts
 
@@ -561,7 +584,7 @@ CAD data passes locally between Codex, the CadScript process, the native host, C
 
 Local files include source models, plans, ownership state, previews, renders, and exports. The bridge token is stored owner-readable in `~/Library/Application Support/onshape-cadscript/bridge.json`.
 
-Removing the extension and running `cadscript bridge uninstall` removes the browser/native-host integration. Delete the application-support directory separately to remove its token and configuration.
+Removing the Chrome extension card and running `cadscript uninstall` removes the browser/native-host integration, optional PM2 daemon, Codex daemon entry, prepared extension files, token, and configuration. It does not remove CAD project folders or Onshape documents. Use `cadscript bridge uninstall` when you only want to remove native-host registration.
 
 
 ---
@@ -590,7 +613,7 @@ CadScript uses the Onshape session already signed in to Chrome. It does not ask 
 Run:
 
 ```sh
-npx -y onshape-cadscript@0.1.3 setup chrome
+npx -y onshape-cadscript@0.1.4 setup chrome
 ```
 
 CadScript copies the bundled Manifest V3 extension to:
@@ -620,6 +643,16 @@ Chrome does not automatically update unpacked extensions. After updating the npm
 
 For custom extension builds, `cadscript bridge install --extension-id <id>` remains available as an explicit development override.
 
+## Uninstalling
+
+Remove the extension card in `chrome://extensions`, then run:
+
+```sh
+cadscript uninstall
+```
+
+That removes the PM2 daemon, its Codex daemon entry, native-host manifests, prepared extension files, and owner-only bridge configuration. It never removes CAD project folders or Onshape documents.
+
 ## Boundaries
 
 The bridge binds to localhost, requires an owner-only random token, validates a protocol version, limits payloads, and allows only selected Onshape REST paths with GET, POST, and DELETE. It does not provide arbitrary browser evaluation.
@@ -636,7 +669,7 @@ The plugin bundles the CadScript skill and launches the matching MCP server with
 ```json
 {
   "command": "npx",
-  "args": ["-y", "onshape-cadscript@0.1.3", "mcp", "--stdio"]
+  "args": ["-y", "onshape-cadscript@0.1.4", "mcp", "--stdio"]
 }
 ```
 
@@ -650,6 +683,49 @@ codex plugin add onshape-cadscript@onshape-cadscript
 Start a new Codex task after installation. Skill metadata allows normal requests such as "make a wall-mount bracket" to discover the workflow without an explicit skill name.
 
 No plugin lifecycle hook installs the native bridge. Bridge installation is always an explicit command.
+
+## Optional HTTP Endpoint
+
+The plugin's stdio server is the simplest default. To keep one loopback MCP process running under PM2 instead:
+
+```sh
+npx -y onshape-cadscript@0.1.4 daemon install --codex
+```
+
+This adds a separate `onshape-cadscript-daemon` entry with `codex mcp add --url`. Remove it with `cadscript daemon uninstall --codex`. See [PM2 daemon](./daemon) for lifecycle and security details.
+
+
+---
+Source: setup/daemon.md
+---
+
+# PM2 Daemon
+
+The Codex plugin launches CadScript over stdio by default. That mode is automatic and does not leave a background process running.
+
+Use the optional daemon when you want one persistent, reusable MCP endpoint:
+
+```sh
+npx -y onshape-cadscript@0.1.4 daemon install --codex
+```
+
+CadScript starts a version-pinned launcher with PM2, waits for `/healthz`, saves PM2 state, and registers `http://127.0.0.1:27184/mcp` as `onshape-cadscript-daemon` in Codex. The service is loopback-only and uses MCP Streamable HTTP.
+
+## Lifecycle
+
+```sh
+cadscript daemon status --json
+cadscript daemon logs --lines 100
+cadscript daemon uninstall --codex
+```
+
+Run `pm2 startup` once if you want PM2 to restore its saved process list after login or reboot. PM2 may print a platform-specific command that requires your approval.
+
+`cadscript daemon uninstall --codex` removes the PM2 process, saved launcher metadata, and optional Codex endpoint. `cadscript uninstall` additionally removes the native host, prepared extension files, and bridge token. Chrome extensions must be removed from `chrome://extensions` because browsers do not allow a local CLI to silently uninstall them.
+
+## Architecture Boundary
+
+PM2 manages the MCP server, not the Chrome native messaging host. Chrome launches the native host on demand and owns its stdin/stdout channel. Keeping those lifecycles separate preserves Chrome's origin checks and avoids a general-purpose browser daemon.
 
 
 ---
@@ -677,11 +753,13 @@ Or install manually:
 ```sh
 codex plugin marketplace add ricokahler/onshape-cadscript --sparse .agents/plugins
 codex plugin add onshape-cadscript@onshape-cadscript
-npx -y onshape-cadscript@0.1.3 setup codex
-npx -y onshape-cadscript@0.1.3 setup chrome
+npx -y onshape-cadscript@0.1.4 setup codex
+npx -y onshape-cadscript@0.1.4 setup chrome
 ```
 
 Continue with [Codex setup](./codex) and [Chrome bridge setup](./chrome).
+
+The plugin needs no background service. People who prefer a persistent local MCP endpoint can also use the [optional PM2 daemon](./daemon).
 
 
 ---
@@ -706,6 +784,13 @@ Use a dedicated empty Part Studio. `--adopt` is only for a studio whose every fe
 ## Apply says the plan is stale
 
 Something changed the workspace after planning. Run `cadscript plan` again and use the new exact plan ID.
+
+## PM2 daemon is not healthy
+
+- Run `cadscript daemon status --json` and `cadscript daemon logs --lines 100`.
+- Confirm port `27184` is free and the configured endpoint is loopback-only.
+- Re-run `cadscript daemon install --codex` after a CadScript upgrade.
+- Run `cadscript daemon uninstall --codex` to return to the plugin's default stdio server.
 
 ## Sketch has warnings
 

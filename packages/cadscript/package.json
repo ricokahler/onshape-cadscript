@@ -1,6 +1,6 @@
 {
   "name": "onshape-cadscript",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Script-first Onshape CAD for Codex and hobby 3D printing",
   "type": "module",
   "license": "MIT",

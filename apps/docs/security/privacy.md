@@ -6,4 +6,4 @@ CAD data passes locally between Codex, the CadScript process, the native host, C
 
 Local files include source models, plans, ownership state, previews, renders, and exports. The bridge token is stored owner-readable in `~/Library/Application Support/onshape-cadscript/bridge.json`.
 
-Removing the extension and running `cadscript bridge uninstall` removes the browser/native-host integration. Delete the application-support directory separately to remove its token and configuration.
+Removing the Chrome extension card and running `cadscript uninstall` removes the browser/native-host integration, optional PM2 daemon, Codex daemon entry, prepared extension files, token, and configuration. It does not remove CAD project folders or Onshape documents. Use `cadscript bridge uninstall` when you only want to remove native-host registration.

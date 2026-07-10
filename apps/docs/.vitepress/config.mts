@@ -23,6 +23,7 @@ export default defineConfig({
           { text: "Overview", link: "/setup/" },
           { text: "Codex plugin", link: "/setup/codex" },
           { text: "Chrome bridge", link: "/setup/chrome" },
+          { text: "PM2 daemon", link: "/setup/daemon" },
           { text: "Troubleshooting", link: "/troubleshooting" },
         ],
       },

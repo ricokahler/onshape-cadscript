@@ -18,6 +18,7 @@ export type FeatureKind =
   | "chamfer"
   | "boolean"
   | "plane"
+  | "split"
   | "transform"
   | "shell"
   | "raw";
@@ -169,9 +170,15 @@ export interface ExtrudeFeature extends FeatureBase<"extrude"> {
   readonly depth?: Length;
   readonly operation: "NEW" | "ADD" | "REMOVE";
   readonly bodyType: "SOLID" | "SURFACE";
-  readonly endBound: "BLIND" | "SYMMETRIC" | "THROUGH_ALL";
+  readonly endBound:
+    "BLIND" | "SYMMETRIC" | "THROUGH_ALL" | "UP_TO_SURFACE" | "UP_TO_BODY" | "UP_TO_VERTEX";
+  readonly endBoundEntity?: QueryRef;
+  readonly offsetDistance?: Length;
   readonly oppositeDirection?: boolean;
   readonly secondDirectionDepth?: Length;
+  readonly secondDirectionBound?: ExtrudeFeature["endBound"];
+  readonly secondDirectionEndBoundEntity?: QueryRef;
+  readonly filterInnerLoops?: boolean;
   readonly scope?: QueryRef;
 }
 
@@ -191,6 +198,8 @@ export interface FilletFeature extends FeatureBase<"fillet"> {
 export interface ChamferFeature extends FeatureBase<"chamfer"> {
   readonly edges: QueryRef;
   readonly width: Length;
+  readonly chamferType?: "EQUAL_OFFSETS" | "TWO_OFFSETS" | "OFFSET_ANGLE";
+  readonly angle?: Angle;
 }
 
 export interface BooleanFeature extends FeatureBase<"boolean"> {
@@ -201,13 +210,27 @@ export interface BooleanFeature extends FeatureBase<"boolean"> {
 
 export interface PlaneFeature extends FeatureBase<"plane"> {
   readonly reference: PlaneRef | QueryRef;
-  readonly offset: Length;
+  readonly planeType?: "OFFSET" | "MID_PLANE" | "LINE_ANGLE" | "LINE_POINT" | "THROUGH";
+  readonly offset?: Length;
+  readonly angle?: Angle;
   readonly oppositeDirection?: boolean;
+}
+
+export interface SplitFeature extends FeatureBase<"split"> {
+  readonly tool: PlaneRef | QueryRef;
+  readonly targets: readonly QueryRef[];
 }
 
 export interface TransformFeature extends FeatureBase<"transform"> {
   readonly bodies: readonly QueryRef[];
-  readonly translation: Point3;
+  readonly transformType?:
+    | "TRANSLATION_3D"
+    | "COPY"
+    | "ROTATION"
+    | "SCALE_UNIFORMLY"
+    | "TRANSLATION_ENTITY"
+    | "MATE_CONNECTORS";
+  readonly translation?: Point3;
   readonly makeCopy?: boolean;
 }
 
@@ -232,6 +255,7 @@ export type FeatureNode =
   | ChamferFeature
   | BooleanFeature
   | PlaneFeature
+  | SplitFeature
   | TransformFeature
   | ShellFeature
   | RawFeature;
@@ -292,6 +316,7 @@ export interface Cad {
   chamfer(options: Omit<ChamferFeature, "kind">): FeatureGenerator<"chamfer">;
   boolean(options: Omit<BooleanFeature, "kind">): FeatureGenerator<"boolean">;
   plane(options: Omit<PlaneFeature, "kind">): FeatureGenerator<"plane">;
+  split(options: Omit<SplitFeature, "kind">): FeatureGenerator<"split">;
   transform(options: Omit<TransformFeature, "kind">): FeatureGenerator<"transform">;
   shell(options: Omit<ShellFeature, "kind">): FeatureGenerator<"shell">;
   rawFeature(options: Omit<RawFeature, "kind">): FeatureGenerator<"raw">;

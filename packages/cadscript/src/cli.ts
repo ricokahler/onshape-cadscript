@@ -1,16 +1,19 @@
 #!/usr/bin/env node
 import { execFile, spawn } from "node:child_process";
-import { writeFile } from "node:fs/promises";
+import { rm, writeFile } from "node:fs/promises";
 import { basename, resolve } from "node:path";
 import { promisify } from "node:util";
 import { Command } from "commander";
 import { BridgeTransport } from "./bridge/client.js";
 import { CADSCRIPT_CHROME_EXTENSION_ID, installChromeExtension } from "./bridge/chrome.js";
+import { chromeExtensionDirectory } from "./bridge/chrome.js";
+import { bridgeDirectory } from "./bridge/config.js";
 import { installBridge, uninstallBridge } from "./bridge/install.js";
 import { materializeModel } from "./core/model.js";
+import { daemonLogs, daemonStatus, installDaemon, uninstallDaemon } from "./daemon.js";
 import { renderSketchPng, renderSketchSvg } from "./core/preview.js";
 import { formatDoctor, runDoctor } from "./doctor.js";
-import { startMcpServer } from "./mcp.js";
+import { startMcpHttpServer, startMcpServer } from "./mcp.js";
 import { OnshapeClient } from "./onshape/client.js";
 import { applyPlan, createPlan, planSummary, readPlan, writePlan } from "./runtime/planner.js";
 import { loadProject, readProjectState, writeStarterProject } from "./runtime/project.js";
@@ -86,6 +89,57 @@ bridge.command("uninstall").action(async () => {
   await uninstallBridge();
   process.stdout.write("Removed the CadScript native host manifests.\n");
 });
+
+const daemon = program.command("daemon").description("Manage the optional PM2 MCP daemon");
+daemon
+  .command("install")
+  .option("--host <host>", "loopback host", "127.0.0.1")
+  .option("--port <port>", "MCP HTTP port", "27184")
+  .option("--codex", "register the HTTP endpoint in the user's Codex config")
+  .action(async (options) => {
+    const status = await installDaemon({ host: options.host, port: Number(options.port) });
+    if (options.codex) {
+      await exec("codex", ["mcp", "remove", "onshape-cadscript-daemon"]).catch(() => undefined);
+      await run("codex", ["mcp", "add", "onshape-cadscript-daemon", "--url", status.endpoint!]);
+    }
+    process.stdout.write(
+      [
+        `Installed ${status.name} with PM2 (${status.status ?? "unknown"}, pid ${status.pid ?? "unknown"}).`,
+        `MCP endpoint: ${status.endpoint}`,
+        "Run `pm2 startup` once if you want PM2 to restore saved processes after login/reboot.",
+      ].join("\n") + "\n",
+    );
+  });
+daemon
+  .command("status")
+  .option("--json", "print JSON")
+  .action(async (options) => {
+    const status = await daemonStatus();
+    process.stdout.write(
+      options.json
+        ? `${JSON.stringify(status, null, 2)}\n`
+        : status.installed
+          ? `${status.name}: ${status.status ?? "unknown"} (pid ${status.pid ?? "unknown"})${status.endpoint ? `\n${status.endpoint}` : ""}\n`
+          : `${status.name}: not installed\n`,
+    );
+  });
+daemon
+  .command("logs")
+  .option("--lines <count>", "number of lines", "100")
+  .action(async (options) => {
+    process.stdout.write(await daemonLogs(Number(options.lines)));
+  });
+daemon
+  .command("uninstall")
+  .option("--codex", "remove the daemon endpoint from Codex")
+  .action(async (options) => {
+    const removed = await uninstallDaemon();
+    if (options.codex)
+      await exec("codex", ["mcp", "remove", "onshape-cadscript-daemon"]).catch(() => undefined);
+    process.stdout.write(
+      removed ? "Removed the CadScript PM2 daemon.\n" : "CadScript PM2 daemon was not installed.\n",
+    );
+  });
 
 const setup = program.command("setup").description("Install integrations");
 setup.command("codex").action(async () => {
@@ -240,8 +294,32 @@ program
 
 program
   .command("mcp")
-  .option("--stdio", "use standard input/output transport", true)
-  .action(startMcpServer);
+  .option("--stdio", "use standard input/output transport")
+  .option("--http", "serve streamable HTTP on localhost")
+  .option("--host <host>", "HTTP host", "127.0.0.1")
+  .option("--port <port>", "HTTP port", "27184")
+  .action(async (options) => {
+    if (options.http) await startMcpHttpServer({ host: options.host, port: Number(options.port) });
+    else await startMcpServer();
+  });
+
+program
+  .command("uninstall")
+  .description("Remove the daemon, native host, and prepared local extension files")
+  .option("--keep-config", "preserve the owner-only bridge token and configuration")
+  .action(async (options) => {
+    await uninstallDaemon();
+    await exec("codex", ["mcp", "remove", "onshape-cadscript-daemon"]).catch(() => undefined);
+    await uninstallBridge();
+    await rm(chromeExtensionDirectory(), { recursive: true, force: true });
+    if (!options.keepConfig) await rm(bridgeDirectory(), { recursive: true, force: true });
+    process.stdout.write(
+      [
+        "Removed CadScript's PM2 daemon, native host, and prepared extension files.",
+        "Remove the Onshape CadScript card from chrome://extensions to finish browser cleanup.",
+      ].join("\n") + "\n",
+    );
+  });
 
 program.parseAsync().catch((error) => {
   process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);

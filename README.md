@@ -6,7 +6,7 @@ Write one typed TypeScript model, let Codex iterate on it with you, and deploy i
 
 <!-- coverage:start -->
 
-[![Stable coverage](https://img.shields.io/badge/stable-22-19A974)](./COVERAGE.md) [![Experimental coverage](https://img.shields.io/badge/experimental-24-D97706)](./COVERAGE.md) [![Roadmap](https://img.shields.io/badge/planned-8-627D98)](./ROADMAP.md)
+[![Stable coverage](https://img.shields.io/badge/stable-22-19A974)](./COVERAGE.md) [![Experimental coverage](https://img.shields.io/badge/experimental-27-D97706)](./COVERAGE.md) [![Roadmap](https://img.shields.io/badge/planned-8-627D98)](./ROADMAP.md)
 <!-- coverage:end -->
 
 > **Unofficial community project.** Onshape CadScript is not affiliated with, endorsed by, or supported by Onshape or PTC.
@@ -43,7 +43,7 @@ codex plugin add onshape-cadscript@onshape-cadscript
 The convenience installer runs those same supported Codex commands and verifies the result:
 
 ```sh
-npx -y onshape-cadscript@0.1.3 setup codex
+npx -y onshape-cadscript@0.1.4 setup codex
 ```
 
 Then start a new Codex task and ask for a CAD model. The bundled skill guides Codex through inspect, edit, preview, plan, exact apply, render, measure, no-op verification, and STL export.
@@ -55,7 +55,7 @@ CadScript does not receive your Onshape password or an API key. A narrow Chrome 
 Prepare the extension and native host:
 
 ```sh
-npx -y onshape-cadscript@0.1.3 setup chrome
+npx -y onshape-cadscript@0.1.4 setup chrome
 ```
 
 The command opens Chrome's Extensions page and reveals the prepared extension directory. Enable Developer Mode, click **Load unpacked**, and select that directory. Then open Onshape, sign in normally, and run `cadscript doctor --json`.
@@ -63,6 +63,17 @@ The command opens Chrome's Extensions page and reveals the prepared extension di
 The manifest carries a stable development identity, so native messaging keeps working across package updates. Chrome does not automatically update unpacked extensions; rerun `setup chrome` after upgrading CadScript and click **Reload** on the extension card. See the [local Chrome setup guide](https://ricokahler.github.io/onshape-cadscript/setup/chrome.html).
 
 The v0.1 bridge supports macOS 13+ with Google Chrome and Node.js 22.14+. Other desktop/browser combinations are tracked in the [roadmap](./ROADMAP.md).
+
+## Optional PM2 Daemon
+
+The Codex plugin uses stdio by default, so no background service is required. For a persistent loopback MCP endpoint, install the optional PM2 daemon and register it with Codex:
+
+```sh
+npx -y onshape-cadscript@0.1.4 daemon install --codex
+cadscript daemon status --json
+```
+
+The endpoint is `http://127.0.0.1:27184/mcp`. PM2 manages only the MCP process; Chrome still launches the narrow native host when Onshape access is needed. Remove the daemon and its Codex entry with `cadscript daemon uninstall --codex`, or remove all local CadScript integration files with `cadscript uninstall`. See the [daemon guide](https://ricokahler.github.io/onshape-cadscript/setup/daemon.html).
 
 ## Why This Shape
 

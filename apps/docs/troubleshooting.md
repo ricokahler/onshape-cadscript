@@ -17,6 +17,13 @@ Use a dedicated empty Part Studio. `--adopt` is only for a studio whose every fe
 
 Something changed the workspace after planning. Run `cadscript plan` again and use the new exact plan ID.
 
+## PM2 daemon is not healthy
+
+- Run `cadscript daemon status --json` and `cadscript daemon logs --lines 100`.
+- Confirm port `27184` is free and the configured endpoint is loopback-only.
+- Re-run `cadscript daemon install --codex` after a CadScript upgrade.
+- Run `cadscript daemon uninstall --codex` to return to the plugin's default stdio server.
+
 ## Sketch has warnings
 
 Warnings are failures. Inspect the local preview, duplicate IDs, zero-length lines, disconnected regions, overconstraints, and imported SVG geometry.

@@ -1,7 +1,10 @@
 import { writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
 import { BridgeTransport } from "./bridge/client.js";
 import { materializeModel } from "./core/model.js";
@@ -45,7 +48,7 @@ function bridgeAndClient() {
   return { bridge, client: new OnshapeClient(bridge) };
 }
 
-export async function startMcpServer(): Promise<void> {
+export function createMcpServer(): McpServer {
   const server = new McpServer({ name: "onshape-cadscript", version: CADSCRIPT_VERSION });
 
   server.registerTool(
@@ -256,5 +259,79 @@ export async function startMcpServer(): Promise<void> {
     },
   );
 
-  await server.connect(new StdioServerTransport());
+  return server;
+}
+
+export async function startMcpServer(): Promise<void> {
+  await createMcpServer().connect(new StdioServerTransport());
+}
+
+export interface McpHttpOptions {
+  readonly host?: string;
+  readonly port?: number;
+}
+
+export async function startMcpHttpServer(options: McpHttpOptions = {}): Promise<void> {
+  const host = options.host ?? "127.0.0.1";
+  const port = options.port ?? 27_184;
+  if (!["127.0.0.1", "localhost", "::1"].includes(host))
+    throw new Error("The CadScript HTTP MCP server only binds to a loopback host");
+  if (!Number.isInteger(port) || port < 1 || port > 65_535)
+    throw new Error("MCP port must be an integer from 1 through 65535");
+
+  type HttpRequest = IncomingMessage & { body?: unknown };
+  type HttpResponse = ServerResponse & {
+    status(code: number): HttpResponse;
+    json(value: unknown): void;
+  };
+  const app = createMcpExpressApp({ host });
+  app.get("/healthz", (_request: HttpRequest, response: HttpResponse) => {
+    response.json({ ok: true, name: "onshape-cadscript", version: CADSCRIPT_VERSION });
+  });
+  app.post("/mcp", async (request: HttpRequest, response: HttpResponse) => {
+    const server = createMcpServer();
+    const transport = new StreamableHTTPServerTransport();
+    let closed = false;
+    const close = () => {
+      if (closed) return;
+      closed = true;
+      void transport.close();
+      void server.close();
+    };
+    response.once("close", close);
+    try {
+      await server.connect(transport as Parameters<McpServer["connect"]>[0]);
+      await transport.handleRequest(request, response, request.body);
+    } catch (error) {
+      if (!response.headersSent) {
+        response.status(500).json({
+          jsonrpc: "2.0",
+          error: {
+            code: -32_603,
+            message: error instanceof Error ? error.message : "Internal MCP server error",
+          },
+          id: null,
+        });
+      }
+    } finally {
+      if (response.writableEnded) close();
+    }
+  });
+  app.all("/mcp", (_request: HttpRequest, response: HttpResponse) => {
+    response.status(405).json({
+      jsonrpc: "2.0",
+      error: { code: -32_000, message: "Method not allowed" },
+      id: null,
+    });
+  });
+
+  await new Promise<void>((resolvePromise, reject) => {
+    const listener = app.listen(port, host, () => {
+      process.stdout.write(`Onshape CadScript MCP listening at http://${host}:${port}/mcp\n`);
+    });
+    listener.on("error", reject);
+    const close = () => listener.close(() => resolvePromise());
+    process.once("SIGINT", close);
+    process.once("SIGTERM", close);
+  });
 }

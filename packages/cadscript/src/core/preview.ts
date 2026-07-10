@@ -47,9 +47,15 @@ function entityPoints(entity: SketchEntity): Point2[] {
   }
 }
 
-function boundsFor(entities: readonly SketchEntity[]): Bounds {
+function boundsFor(entities: readonly SketchEntity[], fallbackSpan: number): Bounds {
   const points = entities.flatMap(entityPoints);
-  if (points.length === 0) return { minX: -10, minY: -10, maxX: 10, maxY: 10 };
+  if (points.length === 0)
+    return {
+      minX: -fallbackSpan / 2,
+      minY: -fallbackSpan / 2,
+      maxX: fallbackSpan / 2,
+      maxY: fallbackSpan / 2,
+    };
   return {
     minX: Math.min(...points.map(([x]) => x)),
     minY: Math.min(...points.map(([, y]) => y)),
@@ -65,9 +71,12 @@ export function renderSketchSvg(model: MaterializedModel, sketchId?: string): st
   if (!sketch || sketch.kind !== "sketch")
     throw new Error(sketchId ? `Sketch ${sketchId} not found` : "Model contains no sketches");
   const entities = expandSketchEntities(sketch.entities);
-  const bounds = boundsFor(entities);
-  const width = Math.max(bounds.maxX - bounds.minX, 1);
-  const height = Math.max(bounds.maxY - bounds.minY, 1);
+  const fallbackSpan = { mm: 20, cm: 2, m: 0.02, in: 1 }[model.units];
+  const bounds = boundsFor(entities, fallbackSpan);
+  const rawWidth = bounds.maxX - bounds.minX;
+  const rawHeight = bounds.maxY - bounds.minY;
+  const width = rawWidth > 0 ? rawWidth : Math.max(rawHeight, fallbackSpan);
+  const height = rawHeight > 0 ? rawHeight : Math.max(rawWidth, fallbackSpan);
   const padding = Math.max(width, height) * 0.12;
   const view = {
     x: bounds.minX - padding,
@@ -163,5 +172,10 @@ export function renderSketchSvg(model: MaterializedModel, sketchId?: string): st
 
 export function renderSketchPng(model: MaterializedModel, sketchId?: string): Uint8Array {
   const svg = renderSketchSvg(model, sketchId);
-  return new Resvg(svg, { fitTo: { mode: "width", value: 1000 } }).render().asPng();
+  return new Resvg(svg, {
+    background: "#f8fafc",
+    fitTo: { mode: "width", value: 1000 },
+  })
+    .render()
+    .asPng();
 }

@@ -430,6 +430,22 @@ function parameter(
   return { btType: "BTMParameterEnum-145", parameterId, enumName, value };
 }
 
+function resolveRawValue(value: unknown, resolve: FeatureIdResolver): unknown {
+  if (typeof value === "string") {
+    return value.replace(
+      /\$feature\(([^)]+)\)/g,
+      (_match, id: string) => `makeId("${resolve(id)}")`,
+    );
+  }
+  if (Array.isArray(value)) return value.map((item) => resolveRawValue(item, resolve));
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [key, resolveRawValue(item, resolve)]),
+    );
+  }
+  return value;
+}
+
 export function featureLabel(modelName: string, feature: Pick<FeatureNode, "id" | "name">): string {
   return `CS[${encodeURIComponent(modelName)}/${feature.id}] ${feature.name ?? feature.id}`;
 }
@@ -479,19 +495,65 @@ export function compileFeature(
       parameter("QueryList", "entities", [profileQuery]),
       parameter("Enum", "endBound", feature.endBound, "BoundingType"),
     );
-    if (feature.depth !== undefined && feature.endBound !== "THROUGH_ALL")
+    if (
+      feature.depth !== undefined &&
+      !["THROUGH_ALL", "UP_TO_SURFACE", "UP_TO_BODY", "UP_TO_VERTEX"].includes(feature.endBound)
+    )
       parameters.push(parameter("Quantity", "depth", lengthExpression(feature.depth, model.units)));
-    if (feature.oppositeDirection) parameters.push(parameter("Boolean", "oppositeDirection", true));
-    if (feature.secondDirectionDepth !== undefined) {
-      parameters.push(parameter("Boolean", "hasSecondDirection", true));
-      parameters.push(parameter("Enum", "secondDirectionBound", "BLIND", "BoundingType"));
+    if (feature.endBoundEntity) {
+      const parameterId =
+        feature.endBound === "UP_TO_SURFACE"
+          ? "endBoundEntityFace"
+          : feature.endBound === "UP_TO_VERTEX"
+            ? "endBoundEntityVertex"
+            : "endBoundEntityBody";
+      parameters.push(
+        parameter("QueryList", parameterId, [individualQuery(feature.endBoundEntity, resolve)]),
+      );
+    }
+    if (feature.offsetDistance !== undefined) {
       parameters.push(
         parameter(
           "Quantity",
-          "secondDirectionDepth",
-          lengthExpression(feature.secondDirectionDepth, model.units),
+          "offsetDistance",
+          lengthExpression(feature.offsetDistance, model.units),
         ),
+        parameter("Boolean", "hasOffset", true),
       );
+    }
+    if (feature.oppositeDirection) parameters.push(parameter("Boolean", "oppositeDirection", true));
+    if (feature.secondDirectionDepth !== undefined || feature.secondDirectionBound !== undefined) {
+      const secondBound = feature.secondDirectionBound ?? "BLIND";
+      parameters.push(parameter("Boolean", "hasSecondDirection", true));
+      parameters.push(parameter("Enum", "secondDirectionBound", secondBound, "BoundingType"));
+      if (
+        feature.secondDirectionDepth !== undefined &&
+        !["THROUGH_ALL", "UP_TO_SURFACE", "UP_TO_BODY", "UP_TO_VERTEX"].includes(secondBound)
+      ) {
+        parameters.push(
+          parameter(
+            "Quantity",
+            "secondDirectionDepth",
+            lengthExpression(feature.secondDirectionDepth, model.units),
+          ),
+        );
+      }
+      if (feature.secondDirectionEndBoundEntity) {
+        const parameterId =
+          secondBound === "UP_TO_SURFACE"
+            ? "secondDirectionEndBoundEntityFace"
+            : secondBound === "UP_TO_VERTEX"
+              ? "secondDirectionEndBoundEntityVertex"
+              : "secondDirectionEndBoundEntityBody";
+        parameters.push(
+          parameter("QueryList", parameterId, [
+            individualQuery(feature.secondDirectionEndBoundEntity, resolve),
+          ]),
+        );
+      }
+    }
+    if (feature.filterInnerLoops && feature.profile.type === "feature") {
+      (profileQuery as Record<string, unknown>).filterInnerLoops = true;
     }
     if (feature.scope) {
       parameters.push(parameter("Boolean", "defaultScope", false));
@@ -520,8 +582,13 @@ export function compileFeature(
         lengthExpression(feature.kind === "fillet" ? feature.radius : feature.width, model.units),
       ),
     );
-    if (feature.kind === "chamfer")
-      parameters.push(parameter("Enum", "chamferType", "EQUAL_OFFSETS", "ChamferType"));
+    if (feature.kind === "chamfer") {
+      parameters.push(
+        parameter("Enum", "chamferType", feature.chamferType ?? "EQUAL_OFFSETS", "ChamferType"),
+      );
+      if (feature.angle !== undefined)
+        parameters.push(parameter("Quantity", "angle", angleExpression(feature.angle)));
+    }
   } else if (feature.kind === "boolean") {
     parameters.push(parameter("Enum", "operationType", feature.operation, "BooleanOperationType"));
     parameters.push(
@@ -545,9 +612,27 @@ export function compileFeature(
         ? planeQuery(feature.reference, resolve)
         : individualQuery(feature.reference, resolve);
     parameters.push(parameter("QueryList", "entities", [referenceQuery]));
-    parameters.push(parameter("Enum", "cplaneType", "OFFSET", "CPlaneType"));
-    parameters.push(parameter("Quantity", "offset", lengthExpression(feature.offset, model.units)));
+    parameters.push(parameter("Enum", "cplaneType", feature.planeType ?? "OFFSET", "CPlaneType"));
+    if (feature.offset !== undefined)
+      parameters.push(
+        parameter("Quantity", "offset", lengthExpression(feature.offset, model.units)),
+      );
+    if (feature.angle !== undefined)
+      parameters.push(parameter("Quantity", "angle", angleExpression(feature.angle)));
     if (feature.oppositeDirection) parameters.push(parameter("Boolean", "oppositeDirection", true));
+  } else if (feature.kind === "split") {
+    const toolQuery =
+      feature.tool.type === "plane"
+        ? planeQuery(feature.tool, resolve)
+        : individualQuery(feature.tool, resolve);
+    parameters.push(parameter("QueryList", "tool", [toolQuery]));
+    parameters.push(
+      parameter(
+        "QueryList",
+        "targets",
+        feature.targets.map((query) => individualQuery(query, resolve)),
+      ),
+    );
   } else if (feature.kind === "transform") {
     parameters.push(
       parameter(
@@ -556,15 +641,24 @@ export function compileFeature(
         feature.bodies.map((query) => individualQuery(query, resolve)),
       ),
     );
-    parameters.push(parameter("Enum", "transformType", "TRANSLATION_3D", "TransformType"));
-    for (const [index, id] of ["dx", "dy", "dz"].entries())
-      parameters.push(
-        parameter(
-          "Quantity",
-          id,
-          lengthExpression(feature.translation[index] as never, model.units),
-        ),
-      );
+    parameters.push(
+      parameter(
+        "Enum",
+        "transformType",
+        feature.transformType ?? "TRANSLATION_3D",
+        "TransformType",
+      ),
+    );
+    if (feature.translation) {
+      for (const [index, id] of ["dx", "dy", "dz"].entries())
+        parameters.push(
+          parameter(
+            "Quantity",
+            id,
+            lengthExpression(feature.translation[index] as never, model.units),
+          ),
+        );
+    }
     if (feature.makeCopy) parameters.push(parameter("Boolean", "makeCopy", true));
   } else if (feature.kind === "shell") {
     parameters.push(parameter("Boolean", "isHollow", feature.hollow ?? false));
@@ -589,7 +683,11 @@ export function compileFeature(
       );
     if (feature.oppositeDirection) parameters.push(parameter("Boolean", "oppositeDirection", true));
   } else if (feature.kind === "raw") {
-    parameters.push(...feature.parameters);
+    parameters.push(
+      ...feature.parameters.map(
+        (item) => resolveRawValue(item, resolve) as Record<string, unknown>,
+      ),
+    );
   }
 
   const featureType =
@@ -597,9 +695,11 @@ export function compileFeature(
       ? "booleanBodies"
       : feature.kind === "plane"
         ? "cPlane"
-        : feature.kind === "raw"
-          ? feature.featureType
-          : feature.kind;
+        : feature.kind === "split"
+          ? "splitPart"
+          : feature.kind === "raw"
+            ? feature.featureType
+            : feature.kind;
   return {
     btType: "BTFeatureDefinitionCall-1406",
     feature: { btType: "BTMFeature-134", featureType, name, parameters },

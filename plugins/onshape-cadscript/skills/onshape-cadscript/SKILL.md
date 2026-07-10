@@ -11,7 +11,7 @@ Use one checked-in `model.ts` as the source of truth. Work in the order **inspec
 
 1. Call `cadscript_bridge_health`.
 2. If the bridge is missing, run `cadscript doctor --json` in the terminal.
-3. If Chrome reports no extension, run `npx -y onshape-cadscript@0.1.3 setup chrome`. Ask the user to enable Developer Mode, click **Load unpacked**, and select the directory printed by the command. Do not operate Chrome's extension installation controls for them.
+3. If Chrome reports no extension, run `npx -y onshape-cadscript@0.1.4 setup chrome`. Ask the user to enable Developer Mode, click **Load unpacked**, and select the directory printed by the command. Do not operate Chrome's extension installation controls for them.
 4. Ask the user to sign in to Onshape normally. Never request an Onshape password, cookie, or API key.
 5. The setup command registers the native host for the stable extension ID; do not ask the user to copy an ID.
 6. Re-run health, then use `onshape_documents` and a read-only `onshape_partstudio_observe` or `onshape_render` check.
@@ -28,7 +28,7 @@ Call `cadscript_project_inspect` before editing. Read `cadscript.config.ts`, `mo
 If no project exists, run:
 
 ```sh
-npx -y onshape-cadscript@0.1.3 init ./my-print
+npx -y onshape-cadscript@0.1.4 init ./my-print
 ```
 
 ### 2. Edit The Model
