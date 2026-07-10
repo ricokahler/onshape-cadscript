@@ -47,4 +47,12 @@ describe("local Chrome extension", () => {
     });
     expect(manifest.key).toBe(CADSCRIPT_CHROME_EXTENSION_PUBLIC_KEY);
   });
+
+  it("keeps one native port alive across install and startup events", async () => {
+    const worker = await readFile(join(sourceDirectory, "service-worker.js"), "utf8");
+    expect(worker).toContain("if (nativePort) return;");
+    expect(worker).toContain("const port = chrome.runtime.connectNative(HOST_NAME);");
+    expect(worker).toContain("if (nativePort === port)");
+    expect(worker).toContain("if (response) port.postMessage(response);");
+  });
 });

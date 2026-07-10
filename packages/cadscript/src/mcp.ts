@@ -9,6 +9,7 @@ import { z } from "zod";
 import { BridgeTransport } from "./bridge/client.js";
 import { materializeModel } from "./core/model.js";
 import { renderSketchSvg } from "./core/preview.js";
+import { MEASURE_FEATURESCRIPT, measuredResult } from "./measure.js";
 import { OnshapeClient } from "./onshape/client.js";
 import { applyPlan, createPlan, planSummary, readPlan, writePlan } from "./runtime/planner.js";
 import { loadProject, readProjectState } from "./runtime/project.js";
@@ -228,15 +229,14 @@ export function createMcpServer(): McpServer {
     {
       title: "Measure Part Studio",
       description:
-        "Return bounding box and approximate mass properties using a fixed read-only FeatureScript query.",
+        "Return bounding box and approximate PLA mass properties using a fixed read-only FeatureScript query.",
       inputSchema: targetSchema,
       annotations: { readOnlyHint: true },
     },
     async (target) =>
       textResult(
-        await bridgeAndClient().client.evaluateFeatureScript(
-          target,
-          'function(context is Context, queries is map) { return { "bounds": evBox3d(context, { "topology": qEverything(EntityType.BODY), "tight": true }), "mass": evApproximateMassProperties(context, { "entities": qEverything(EntityType.BODY) }) }; }',
+        measuredResult(
+          await bridgeAndClient().client.evaluateFeatureScript(target, MEASURE_FEATURESCRIPT),
         ),
       ),
   );

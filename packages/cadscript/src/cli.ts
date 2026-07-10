@@ -13,6 +13,7 @@ import { materializeModel } from "./core/model.js";
 import { daemonLogs, daemonStatus, installDaemon, uninstallDaemon } from "./daemon.js";
 import { renderSketchPng, renderSketchSvg } from "./core/preview.js";
 import { formatDoctor, runDoctor } from "./doctor.js";
+import { MEASURE_FEATURESCRIPT, measuredResult } from "./measure.js";
 import { startMcpHttpServer, startMcpServer } from "./mcp.js";
 import { OnshapeClient } from "./onshape/client.js";
 import { applyPlan, createPlan, planSummary, readPlan, writePlan } from "./runtime/planner.js";
@@ -271,9 +272,9 @@ program
     const { project } = await loadedModel(options.cwd);
     const result = await client().evaluateFeatureScript(
       targetOrThrow(project.config.target),
-      'function(context is Context, queries is map) { return { "bounds": evBox3d(context, { "topology": qEverything(EntityType.BODY), "tight": true }), "mass": evApproximateMassProperties(context, { "entities": qEverything(EntityType.BODY) }) }; }',
+      MEASURE_FEATURESCRIPT,
     );
-    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    process.stdout.write(`${JSON.stringify(measuredResult(result), null, 2)}\n`);
   });
 
 program

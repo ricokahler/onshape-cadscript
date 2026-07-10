@@ -51,15 +51,17 @@ async function forward(request) {
 }
 
 function connect() {
+  if (nativePort) return;
   try {
-    nativePort = chrome.runtime.connectNative(HOST_NAME);
+    const port = chrome.runtime.connectNative(HOST_NAME);
+    nativePort = port;
     setBadge(true);
-    nativePort.onMessage.addListener(async (request) => {
+    port.onMessage.addListener(async (request) => {
       try {
         const response = await forward(request);
-        if (response) nativePort?.postMessage(response);
+        if (response) port.postMessage(response);
       } catch (error) {
-        nativePort?.postMessage({
+        port.postMessage({
           id: request.id,
           ok: false,
           status: 0,
@@ -69,9 +71,11 @@ function connect() {
         });
       }
     });
-    nativePort.onDisconnect.addListener(() => {
-      nativePort = undefined;
-      setBadge(false);
+    port.onDisconnect.addListener(() => {
+      if (nativePort === port) {
+        nativePort = undefined;
+        setBadge(false);
+      }
     });
   } catch {
     nativePort = undefined;

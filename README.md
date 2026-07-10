@@ -43,7 +43,7 @@ codex plugin add onshape-cadscript@onshape-cadscript
 The convenience installer runs those same supported Codex commands and verifies the result:
 
 ```sh
-npx -y onshape-cadscript@0.1.5 setup codex
+npx -y onshape-cadscript@0.1.6 setup codex
 ```
 
 Then start a new Codex task and ask for a CAD model. The bundled skill guides Codex through inspect, edit, preview, plan, exact apply, render, measure, no-op verification, and STL export.
@@ -55,7 +55,7 @@ CadScript does not receive your Onshape password or an API key. A narrow Chrome 
 Prepare the extension and native host:
 
 ```sh
-npx -y onshape-cadscript@0.1.5 setup chrome
+npx -y onshape-cadscript@0.1.6 setup chrome
 ```
 
 The command opens Chrome's Extensions page and reveals the prepared extension directory. Enable Developer Mode, click **Load unpacked**, and select that directory. Then open Onshape, sign in normally, and run `cadscript doctor --json`.
@@ -69,7 +69,7 @@ The v0.1 bridge supports macOS 13+ with Google Chrome and Node.js 22.14+. Other 
 The Codex plugin uses stdio by default, so no background service is required. For a persistent loopback MCP endpoint, install the optional PM2 daemon and register it with Codex:
 
 ```sh
-npx -y onshape-cadscript@0.1.5 daemon install --codex
+npx -y onshape-cadscript@0.1.6 daemon install --codex
 cadscript daemon status --json
 ```
 

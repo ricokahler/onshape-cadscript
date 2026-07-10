@@ -5,7 +5,7 @@ The Codex plugin launches CadScript over stdio by default. That mode is automati
 Use the optional daemon when you want one persistent, reusable MCP endpoint:
 
 ```sh
-npx -y onshape-cadscript@0.1.5 daemon install --codex
+npx -y onshape-cadscript@0.1.6 daemon install --codex
 ```
 
 CadScript starts a version-pinned launcher with PM2, waits for `/healthz`, saves PM2 state, and registers `http://127.0.0.1:27184/mcp` as `onshape-cadscript-daemon` in Codex. The service is loopback-only and uses MCP Streamable HTTP.
