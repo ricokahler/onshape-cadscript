@@ -5,7 +5,7 @@ The plugin bundles the CadScript skill and launches the matching MCP server with
 ```json
 {
   "command": "npx",
-  "args": ["-y", "onshape-cadscript@0.1.4", "mcp", "--stdio"]
+  "args": ["-y", "onshape-cadscript@0.1.5", "mcp", "--stdio"]
 }
 ```
 
@@ -25,7 +25,7 @@ No plugin lifecycle hook installs the native bridge. Bridge installation is alwa
 The plugin's stdio server is the simplest default. To keep one loopback MCP process running under PM2 instead:
 
 ```sh
-npx -y onshape-cadscript@0.1.4 daemon install --codex
+npx -y onshape-cadscript@0.1.5 daemon install --codex
 ```
 
 This adds a separate `onshape-cadscript-daemon` entry with `codex mcp add --url`. Remove it with `cadscript daemon uninstall --codex`. See [PM2 daemon](./daemon) for lifecycle and security details.

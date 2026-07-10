@@ -1,5 +1,11 @@
 # onshape-cadscript-codex
 
+## 0.1.5
+
+### Patch Changes
+
+- Use PM2's Node resolution for the optional daemon so npx, Homebrew Node, and NVM installations work together.
+
 ## 0.1.4
 
 ### Patch Changes

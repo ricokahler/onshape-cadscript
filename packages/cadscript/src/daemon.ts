@@ -1,6 +1,7 @@
+import { homedir } from "node:os";
+import { join } from "node:path";
 import { execFile } from "node:child_process";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import { promisify } from "node:util";
 import { bridgeDirectory } from "./bridge/config.js";
 import { CADSCRIPT_VERSION } from "./version.js";
@@ -28,8 +29,12 @@ function daemonConfigPath(): string {
   return join(bridgeDirectory(), "daemon.json");
 }
 
+function daemonDirectory(): string {
+  return join(homedir(), ".local", "share", "onshape-cadscript");
+}
+
 function daemonLauncherPath(): string {
-  return join(bridgeDirectory(), "daemon.mjs");
+  return join(daemonDirectory(), "daemon.mjs");
 }
 
 async function commandPath(command: string): Promise<string | undefined> {
@@ -123,6 +128,7 @@ export async function installDaemon(options: DaemonOptions = {}): Promise<Daemon
   if (!npx) throw new Error("CadScript daemon installation requires npm/npx");
   const endpoint = `http://${host.includes(":") ? `[${host}]` : host}:${port}/mcp`;
   await mkdir(bridgeDirectory(), { recursive: true, mode: 0o700 });
+  await mkdir(daemonDirectory(), { recursive: true, mode: 0o700 });
   await writeFile(
     daemonLauncherPath(),
     [
@@ -151,16 +157,7 @@ export async function installDaemon(options: DaemonOptions = {}): Promise<Daemon
   );
 
   if ((await daemonStatus()).installed) await runPm2(["delete", PROCESS_NAME]);
-  await runPm2([
-    "start",
-    daemonLauncherPath(),
-    "--name",
-    PROCESS_NAME,
-    "--interpreter",
-    process.execPath,
-    "--time",
-    "--update-env",
-  ]);
+  await runPm2(["start", daemonLauncherPath(), "--name", PROCESS_NAME, "--time", "--update-env"]);
   await savePm2State();
   await waitForHealth(endpoint);
   const status = await daemonStatus();
@@ -174,6 +171,7 @@ export async function uninstallDaemon(): Promise<boolean> {
     await savePm2State();
   }
   await rm(daemonLauncherPath(), { force: true });
+  await rm(daemonDirectory(), { recursive: true, force: true });
   await rm(daemonConfigPath(), { force: true });
   return installed;
 }

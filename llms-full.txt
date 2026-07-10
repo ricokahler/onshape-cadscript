@@ -613,7 +613,7 @@ CadScript uses the Onshape session already signed in to Chrome. It does not ask 
 Run:
 
 ```sh
-npx -y onshape-cadscript@0.1.4 setup chrome
+npx -y onshape-cadscript@0.1.5 setup chrome
 ```
 
 CadScript copies the bundled Manifest V3 extension to:
@@ -669,7 +669,7 @@ The plugin bundles the CadScript skill and launches the matching MCP server with
 ```json
 {
   "command": "npx",
-  "args": ["-y", "onshape-cadscript@0.1.4", "mcp", "--stdio"]
+  "args": ["-y", "onshape-cadscript@0.1.5", "mcp", "--stdio"]
 }
 ```
 
@@ -689,7 +689,7 @@ No plugin lifecycle hook installs the native bridge. Bridge installation is alwa
 The plugin's stdio server is the simplest default. To keep one loopback MCP process running under PM2 instead:
 
 ```sh
-npx -y onshape-cadscript@0.1.4 daemon install --codex
+npx -y onshape-cadscript@0.1.5 daemon install --codex
 ```
 
 This adds a separate `onshape-cadscript-daemon` entry with `codex mcp add --url`. Remove it with `cadscript daemon uninstall --codex`. See [PM2 daemon](./daemon) for lifecycle and security details.
@@ -706,7 +706,7 @@ The Codex plugin launches CadScript over stdio by default. That mode is automati
 Use the optional daemon when you want one persistent, reusable MCP endpoint:
 
 ```sh
-npx -y onshape-cadscript@0.1.4 daemon install --codex
+npx -y onshape-cadscript@0.1.5 daemon install --codex
 ```
 
 CadScript starts a version-pinned launcher with PM2, waits for `/healthz`, saves PM2 state, and registers `http://127.0.0.1:27184/mcp` as `onshape-cadscript-daemon` in Codex. The service is loopback-only and uses MCP Streamable HTTP.
@@ -753,8 +753,8 @@ Or install manually:
 ```sh
 codex plugin marketplace add ricokahler/onshape-cadscript --sparse .agents/plugins
 codex plugin add onshape-cadscript@onshape-cadscript
-npx -y onshape-cadscript@0.1.4 setup codex
-npx -y onshape-cadscript@0.1.4 setup chrome
+npx -y onshape-cadscript@0.1.5 setup codex
+npx -y onshape-cadscript@0.1.5 setup chrome
 ```
 
 Continue with [Codex setup](./codex) and [Chrome bridge setup](./chrome).
