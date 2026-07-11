@@ -55,10 +55,4 @@ describe("local Chrome extension", () => {
     expect(worker).toContain("if (nativePort === port)");
     expect(worker).toContain("if (response) port.postMessage(response);");
   });
-
-  it("allows the STL request to select Onshape's v9 endpoint", async () => {
-    const content = await readFile(join(sourceDirectory, "content.js"), "utf8");
-    expect(content).toContain("request.apiVersion === 9 ? 9 : 15");
-    expect(content).toContain("/api/v${apiVersion}${request.path}");
-  });
 });

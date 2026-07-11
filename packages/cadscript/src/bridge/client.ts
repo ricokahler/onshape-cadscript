@@ -26,7 +26,6 @@ export class BridgeTransport implements OnshapeTransport {
         type: "http",
         method: request.method ?? "GET",
         path: request.path,
-        apiVersion: request.apiVersion,
         query: request.query,
         body: request.body,
       };

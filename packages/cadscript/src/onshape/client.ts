@@ -183,7 +183,6 @@ export class OnshapeClient {
   async exportStl(target: OnshapeTarget): Promise<string> {
     return this.call({
       path: `${this.base(target)}/stl`,
-      apiVersion: 9,
       query: { mode: "text", units: "millimeter" },
       responseType: "text",
     });
