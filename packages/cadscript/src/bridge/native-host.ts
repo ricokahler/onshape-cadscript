@@ -9,6 +9,7 @@ interface LocalRequest {
   readonly type: "http" | "selection" | "health";
   readonly method?: "GET" | "POST" | "DELETE";
   readonly path?: string;
+  readonly apiVersion?: 9 | 15;
   readonly query?: Record<string, string>;
   readonly body?: unknown;
 }

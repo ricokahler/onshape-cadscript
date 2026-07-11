@@ -38,7 +38,8 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     const controller = new AbortController();
     requests.set(request.id, controller);
     try {
-      const url = new URL(`/api/v15${request.path}`, "https://cad.onshape.com");
+      const apiVersion = request.apiVersion === 9 ? 9 : 15;
+      const url = new URL(`/api/v${apiVersion}${request.path}`, "https://cad.onshape.com");
       if (url.origin !== "https://cad.onshape.com" || !url.pathname.startsWith("/api/"))
         throw new Error("Request URL is outside cad.onshape.com/api");
       for (const [key, value] of Object.entries(request.query || {}))
