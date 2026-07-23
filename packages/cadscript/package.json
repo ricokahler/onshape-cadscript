@@ -50,11 +50,11 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.0",
     "@resvg/resvg-js": "^2.6.2",
-    "commander": "^14.0.0",
-    "fast-xml-parser": "^5.2.5",
+    "commander": "^15.0.0",
+    "fast-xml-parser": "^5.10.1",
     "jiti": "^2.4.2",
-    "svg-pathdata": "^8.0.0",
-    "zod": "^3.25.67"
+    "svg-pathdata": "^9.0.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "tsup": "^8.5.0"
